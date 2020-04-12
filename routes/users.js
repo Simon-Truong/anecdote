@@ -16,8 +16,6 @@ router.get("/users", async (req, res) => {
     res.send(result);
   } catch (error) {
     console.log({ error });
-  } finally {
-    pool.end();
   }
 });
 
