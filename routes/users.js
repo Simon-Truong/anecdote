@@ -1,9 +1,24 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-router.get("/users", (req, res) => {
-  console.log("users");
-  res.send("users");
+const { Pool } = require("pg");
+
+const connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
+
+const pool = new Pool({
+  connectionString,
+});
+
+router.get("/users", async (req, res) => {
+  try {
+    const result = (await pool.query("SELECT * FROM users")).rows;
+
+    res.send(result);
+  } catch (error) {
+    console.log({ error });
+  } finally {
+    pool.end();
+  }
 });
 
 module.exports = router;

@@ -12,6 +12,4 @@ app.use(express.json());
 
 app.use("/api", users);
 
-app.listen(port, () =>
-  console.log(`Example app listening at http://localhost:${port}`)
-);
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
