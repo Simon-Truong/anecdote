@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Joi = require("@hapi/joi");
 
 const { Pool } = require("pg");
 
@@ -29,7 +30,34 @@ router.get("/users", async (req, res) => {
   } catch (error) {
     console.log({ error });
 
-    res.sendStatus(500);
+    res.sendStatus(400);
+  }
+});
+
+router.post("/user", (req, res) => {
+  console.log(req.body);
+
+  const { firstName, surname, email } = req.body;
+
+  const schema = Joi.object({
+    firstName: Joi.string().trim().required(),
+    surname: Joi.string().trim().required(),
+    email: Joi.string().trim().email().required(),
+    password: Joi.string()
+      .pattern(new RegExp(/[A-Z]/))
+      .pattern(new RegExp(/[a-z]/))
+      .pattern(new RegExp(/[0-9]/))
+      .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
+      .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
+      .required(),
+    joined: Joi.date().iso().required(),
+  });
+
+  try {
+    const result = schema.validateAsync(req.body);
+    console.log({ result });
+  } catch (error) {
+    console.log({ error });
   }
 });
 
