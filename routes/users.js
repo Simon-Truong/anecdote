@@ -1,8 +1,8 @@
 const express = require("express");
-const router = express.Router();
-const Joi = require("@hapi/joi");
-
 const { Pool } = require("pg");
+const validation = require("../middleware/validation");
+
+const router = express.Router();
 
 const connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
@@ -34,31 +34,8 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.post("/user", (req, res) => {
-  console.log(req.body);
-
-  const { firstName, surname, email } = req.body;
-
-  const schema = Joi.object({
-    firstName: Joi.string().trim().required(),
-    surname: Joi.string().trim().required(),
-    email: Joi.string().trim().email().required(),
-    password: Joi.string()
-      .pattern(new RegExp(/[A-Z]/))
-      .pattern(new RegExp(/[a-z]/))
-      .pattern(new RegExp(/[0-9]/))
-      .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
-      .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
-      .required(),
-    joined: Joi.date().iso().required(),
-  });
-
-  try {
-    const result = schema.validateAsync(req.body);
-    console.log({ result });
-  } catch (error) {
-    console.log({ error });
-  }
+router.post("/user", validation, (req, res) => {
+  
 });
 
 module.exports = router;
