@@ -1,8 +1,6 @@
 const Joi = require("@hapi/joi");
 
 module.exports = (req, res, next) => {
-  console.log(req.body);
-
   const { firstName, surname, email } = req.body;
 
   const schema = Joi.object({
@@ -18,11 +16,10 @@ module.exports = (req, res, next) => {
       .required(),
     joined: Joi.date().iso().required(),
   });
-  
+
   schema
     .validateAsync(req.body)
     .then((response) => {
-      console.log({ response });
       next();
     })
     .catch((error) => {
