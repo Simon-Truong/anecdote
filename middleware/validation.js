@@ -1,6 +1,6 @@
 const Joi = require("@hapi/joi");
 
-module.exports = (req, res, next) => {
+const forSignUp = (req, res, next) => {
   const { firstName, surname, email } = req.body;
 
   const schema = Joi.object({
@@ -26,4 +26,26 @@ module.exports = (req, res, next) => {
       console.log({ error });
       res.status(400).send(error.message);
     });
+};
+
+const forLogin = (req, res, next) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  });
+
+  schema
+    .validateAsync(req.body)
+    .then((response) => {
+      next();
+    })
+    .catch((error) => {
+      console.log({ error });
+      res.status(400).send(error.message);
+    });
+};
+
+module.exports = {
+  forSignUp,
+  forLogin
 };
