@@ -1,4 +1,5 @@
 const _repo = require("../repository/user.repository");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 async function getUsers(req, res) {
@@ -58,7 +59,7 @@ async function logIn(req, res) {
   const { body } = req;
 
   try {
-    var user = await _repo.getUserByEmail(body.email);
+    var response = await _repo.getUserByEmail(body.email);
   } catch (error) {
     console.log({
       error,
@@ -66,24 +67,33 @@ async function logIn(req, res) {
     res.status(400).send(error);
   }
 
-  if (!user.length) {
+  if (!response.length) {
     return res.status(400).send("Email or Password is incorrect");
   }
 
-  user = user[0];
+  const user = response[0];
 
   bcrypt.compare(body.password, user.password, (error, result) => {
     if (error || !result) {
       res.status(400).send("Email or Password is incorrect");
     }
 
-    // TODO: send JWT here
-    res.status(200);
+    const SECONDS_IN_A_DAY = 86400;
+
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        exp: Math.floor(Date.now() / 1000) + SECONDS_IN_A_DAY,
+      },
+      process.env.JWT_SECRET
+    );
+    
+    res.status(200).send({ token });
   });
 }
 
 module.exports = {
   getUsers,
   signUp,
-  logIn
+  logIn,
 };
