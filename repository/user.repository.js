@@ -38,7 +38,13 @@ async function getUserByEmail(email) {
       WHERE email = $1
     `;
 
-  return (await _pool.query(pgQuery, [email])).rows;
+  const response = (await _pool.query(pgQuery, [email])).rows;
+
+  if (!response.length) {
+    return null;
+  }
+
+  return response[0];
 }
 
 async function createUser(newUser) {
