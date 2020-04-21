@@ -1,6 +1,6 @@
-const uuid = require("uuid");
-const pgp = require("pg-promise");
-const { Pool } = require("pg");
+const uuid = require('uuid');
+const pgp = require('pg-promise');
+const { Pool } = require('pg');
 
 const _connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
@@ -48,14 +48,16 @@ async function getUserByEmail(email) {
 }
 
 async function createUser(newUser) {
-  const { firstName, surname, email, password, joined } = newUser;
+  const { firstName, surname, email, password, joined, tags } = newUser;
+
+  const processedTags = tags ? `{${tags.join(', ')}}` : '{}';
 
   const pgQuery = `
-      INSERT INTO ${process.env.TABLE} (id, first_name, surname, email, password, joined)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO ${process.env.TABLE} (id, first_name, surname, email, password, joined, tags)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
-  return await _pool.query(pgQuery, [uuid.v4(), firstName, surname, email, password, joined]);
+  return await _pool.query(pgQuery, [uuid.v4(), firstName, surname, email, password, joined, processedTags]);
 }
 
 //! debugging purposes only
