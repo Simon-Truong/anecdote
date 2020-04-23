@@ -49,7 +49,9 @@ async function signUp(req, res) {
     newUser.password = hash;
 
     try {
-      var result = await _repo.createUser(newUser);
+      var newUserId = await _repo.createUser(newUser);
+
+      await _repo.createVerifyToken(newUserId);
     } catch (error) {
       return res.status(500).send(error);
     }

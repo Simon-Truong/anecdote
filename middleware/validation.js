@@ -1,6 +1,10 @@
-const Joi = require("@hapi/joi");
+'use strict';
+
+const Joi = require('@hapi/joi');
 
 const forSignUp = (req, res, next) => {
+  'use strict';
+
   const { firstName, surname, email } = req.body;
 
   const schema = Joi.object({
@@ -15,6 +19,7 @@ const forSignUp = (req, res, next) => {
       .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
       .required(),
     joined: Joi.date().iso().required(),
+    tags: Joi.array().sparse()
   });
 
   schema
@@ -29,6 +34,8 @@ const forSignUp = (req, res, next) => {
 };
 
 const forLogin = (req, res, next) => {
+  'use strict';
+
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
@@ -47,5 +54,5 @@ const forLogin = (req, res, next) => {
 
 module.exports = {
   forSignUp,
-  forLogin
+  forLogin,
 };

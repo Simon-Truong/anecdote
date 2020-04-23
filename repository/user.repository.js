@@ -1,3 +1,5 @@
+'use strict';
+
 const uuid = require('uuid');
 const pgp = require('pg-promise');
 const { Pool } = require('pg');
@@ -9,6 +11,8 @@ const _pool = new Pool({
 });
 
 async function getAllUsers() {
+  'use strict';
+
   const pgQuery = `
       SELECT *
       FROM ${process.env.TABLE}
@@ -18,6 +22,8 @@ async function getAllUsers() {
 }
 
 async function searchUsers(query) {
+  'use strict';
+
   const pgQuery = `
       SELECT DISTINCT id, first_name, surname, tags
       FROM (SELECT id, first_name, surname, tags, unnest(tags) AS unnestedTags
@@ -32,6 +38,8 @@ async function searchUsers(query) {
 }
 
 async function getUserByEmail(email) {
+  'use strict';
+
   const pgQuery = `
       SELECT *
       FROM ${process.env.TABLE}
@@ -48,6 +56,8 @@ async function getUserByEmail(email) {
 }
 
 async function createUser(newUser) {
+  'use strict';
+
   const { firstName, surname, email, password, joined, tags } = newUser;
 
   const processedTags = tags ? `{${tags.join(', ')}}` : '{}';
@@ -57,7 +67,15 @@ async function createUser(newUser) {
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
-  return await _pool.query(pgQuery, [uuid.v4(), firstName, surname, email, password, joined, processedTags]);
+  const newUUID = uuid.v4();
+
+  await _pool.query(pgQuery, [newUUID, firstName, surname, email, password, joined, processedTags]);
+
+  return newUUID;
+}
+
+function createVerifyToken() {
+  'use strict';
 }
 
 //! debugging purposes only
