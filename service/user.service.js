@@ -1,5 +1,6 @@
 'use strict';
-const _repo = require('../repository/user.repository');
+const _userRepo = require('../repository/user.repository');
+const _emailService = require('./email.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -9,9 +10,9 @@ async function getUsers(req, res) {
 
   try {
     if (q) {
-      var result = await _repo.searchUsers(q);
+      var result = await _userRepo.searchUsers(q);
     } else {
-      var result = await _repo.getAllUsers();
+      var result = await _userRepo.getAllUsers();
     }
 
     res.send(result);
@@ -29,7 +30,7 @@ async function signUp(req, res) {
   const { body } = req;
 
   try {
-    var existentUser = await _repo.getUserByEmail(body.email);
+    var existentUser = await _userRepo.getUserByEmail(body.email);
   } catch (error) {
     console.log({ error });
     return res.status(500).send(error);
@@ -52,9 +53,11 @@ async function signUp(req, res) {
     newUser.password = hash;
 
     try {
-      var newUserId = await _repo.createUser(newUser);
+      const newUserId = await _userRepo.createUser(newUser);
 
-      await _repo.createVerifyToken(newUserId);
+      const secretToken = await _userRepo.createVerifyToken(newUserId);
+
+      await _emailService.sendEmail(newUser.email, secretToken);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
