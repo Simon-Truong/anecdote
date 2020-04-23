@@ -1,8 +1,10 @@
 'use strict';
 
 const uuid = require('uuid');
-const pgp = require('pg-promise');
+const cryptoRandomString = require('crypto-random-string');
 const { Pool } = require('pg');
+const moment = require('moment');
+const pgp = require('pg-promise');
 
 const _connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
@@ -15,7 +17,7 @@ async function getAllUsers() {
 
   const pgQuery = `
       SELECT *
-      FROM ${process.env.TABLE}
+      FROM ${process.env.USER_TABLE}
     `;
 
   return (await _pool.query(pgQuery)).rows;
@@ -27,7 +29,7 @@ async function searchUsers(query) {
   const pgQuery = `
       SELECT DISTINCT id, first_name, surname, tags
       FROM (SELECT id, first_name, surname, tags, unnest(tags) AS unnestedTags
-        FROM ${process.env.TABLE}) x
+        FROM ${process.env.USER_TABLE}) x
       WHERE 
       lower(first_name) LIKE $1 OR
       lower(surname) LIKE $1 OR
@@ -42,7 +44,7 @@ async function getUserByEmail(email) {
 
   const pgQuery = `
       SELECT *
-      FROM ${process.env.TABLE}
+      FROM ${process.env.USER_TABLE}
       WHERE email = $1
     `;
 
@@ -58,24 +60,33 @@ async function getUserByEmail(email) {
 async function createUser(newUser) {
   'use strict';
 
-  const { firstName, surname, email, password, joined, tags } = newUser;
+  const { firstName, surname, email, password, tags } = newUser;
 
   const processedTags = tags ? `{${tags.join(', ')}}` : '{}';
 
   const pgQuery = `
-      INSERT INTO ${process.env.TABLE} (id, first_name, surname, email, password, joined, tags)
+      INSERT INTO ${process.env.USER_TABLE}
+      (id, first_name, surname, email, password, joined, tags)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
   const newUUID = uuid.v4();
 
-  await _pool.query(pgQuery, [newUUID, firstName, surname, email, password, joined, processedTags]);
+  await _pool.query(pgQuery, [newUUID, firstName, surname, email, password, moment.utc(), processedTags]);
 
   return newUUID;
 }
 
-function createVerifyToken() {
+async function createVerifyToken(newUserId) {
   'use strict';
+
+  const pgQuery = `
+    INSERT INTO ${process.env.VERIFY_TOKENS_TABLE}
+    (id, userid, secret, expiry)
+    VALUES ($1, $2, $3, $4)
+  `;
+
+  return await _pool.query(pgQuery, [uuid.v4(), newUserId, cryptoRandomString({ length: 10, type: 'base64' }), moment().add(1, 'h').utc()]);
 }
 
 //! debugging purposes only
@@ -91,4 +102,5 @@ module.exports = {
   searchUsers,
   getUserByEmail,
   createUser,
+  createVerifyToken
 };

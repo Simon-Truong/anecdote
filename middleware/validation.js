@@ -18,7 +18,6 @@ const forSignUp = (req, res, next) => {
       .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
       .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
       .required(),
-    joined: Joi.date().iso().required(),
     tags: Joi.array().sparse()
   });
 
