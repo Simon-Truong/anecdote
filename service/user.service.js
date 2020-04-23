@@ -31,10 +31,12 @@ async function signUp(req, res) {
   try {
     var existentUser = await _repo.getUserByEmail(body.email);
   } catch (error) {
+    console.log({ error });
     return res.status(500).send(error);
   }
 
   if (existentUser) {
+    console.log('Email is already in user.');
     return res.status(400).send('Email is already in use.');
   }
 
@@ -42,6 +44,7 @@ async function signUp(req, res) {
 
   bcrypt.hash(body.password, SALT_ROUNDS, async (error, hash) => {
     if (error) {
+      console.log({ error });
       return res.status(500);
     }
 
@@ -53,6 +56,7 @@ async function signUp(req, res) {
 
       await _repo.createVerifyToken(newUserId);
     } catch (error) {
+      console.log({ error });
       return res.status(500).send(error);
     }
 
