@@ -1,0 +1,11 @@
+# .env
+```
+PORT=
+JWT_SECRET=
+USER=
+PASSWORD=
+HOST=
+POSTGRESQL_PORT=
+DB=
+TABLE=
+```
