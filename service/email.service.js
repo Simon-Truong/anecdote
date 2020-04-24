@@ -24,7 +24,7 @@ const mailTrap = {
 
 const emailClient = nodemailer.createTransport(mailTrap);
 
-function sendEmail(email, firstName, secretToken) {
+function sendEmail(userId, email, firstName, secretToken) {
   'use strict';
 
   const emailOptions = {
@@ -32,7 +32,7 @@ function sendEmail(email, firstName, secretToken) {
     to: email,
     subject: 'Sign Up',
     text: 'Thank you for signing up to Anecdote', // TODO
-    html: emailTemplate.generate(firstName, secretToken),
+    html: emailTemplate.generate(userId, firstName, secretToken),
   };
 
   return new Promise((resolve, reject) => {
