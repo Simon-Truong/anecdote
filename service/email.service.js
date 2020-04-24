@@ -2,6 +2,7 @@
 
 const nodemailer = require('nodemailer');
 const mailgunTransport = require('nodemailer-mailgun-transport');
+const emailTemplate = require('../shared/email-template');
 
 // const auth = {
 //   auth: {
@@ -23,15 +24,15 @@ const mailTrap = {
 
 const emailClient = nodemailer.createTransport(mailTrap);
 
-function sendEmail(email, secretToken) {
+function sendEmail(email, firstName, secretToken) {
   'use strict';
 
   const emailOptions = {
     from: '<donotreply@anecdote.com.au>',
     to: email,
-    subject: 'Anecdote Sign Up',
-    text: 'Thank you for signing up to Anecdote',
-    html: '<b>Testing</b>',
+    subject: 'Sign Up',
+    text: 'Thank you for signing up to Anecdote', // TODO
+    html: emailTemplate.generate(firstName, secretToken),
   };
 
   return new Promise((resolve, reject) => {
