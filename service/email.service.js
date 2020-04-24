@@ -1,34 +1,50 @@
-const nodemailer = require('nodemailer');
+'use strict';
 
-const transporter = nodemailer.createTransport( {
-    service:  'Mailgun',
-    auth: {
-     domain: `${process.env.MAIL_GUN_DOMAIN}`,
-     api_key: `${process.env.MAIL_GUN_API_KEY}`   
-    }
-});
+const nodemailer = require('nodemailer');
+const mailgunTransport = require('nodemailer-mailgun-transport');
+
+// const auth = {
+//   auth: {
+//     api_key: process.env.MAILGUN_API_KEY,
+//     domain: process.env.MAILGUN_DOMAIN,
+//   },
+// };
+
+// const emailClient = nodemailer.createTransport(mailgunTransport(auth));
+
+const mailTrap = {
+  host: 'smtp.mailtrap.io',
+  port: 2525,
+  auth: {
+    user: '8496df82ba0789',
+    pass: 'af60ea0a91905e',
+  },
+};
+
+const emailClient = nodemailer.createTransport(mailTrap);
 
 function sendEmail(email, secretToken) {
-    const mailOpts = {
-        from: 'donotreply@anecdote.com.au',
-        to: email,
-        subject: 'Anecdote Sign Up',
-        text : 'Thank you for signing up to Anecdote',
-        html : '<b>Testing</b>'
-    };
+  'use strict';
 
-    return new Promise((resolve, reject) => {
-        transporter.sendMail(mailOpts, (error, response) => {
-            if (error) {
-                console.log({error});
-                reject(error);
-            }
+  const emailOptions = {
+    from: '<donotreply@anecdote.com.au>',
+    to: email,
+    subject: 'Anecdote Sign Up',
+    text: 'Thank you for signing up to Anecdote',
+    html: '<b>Testing</b>',
+  };
 
-            resolve(response);
-        });
-    })
+  return new Promise((resolve, reject) => {
+    emailClient.sendMail(emailOptions, (err, info) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(info);
+      }
+    });
+  });
 }
 
 module.exports = {
-    sendEmail
-}
+  sendEmail,
+};
