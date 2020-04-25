@@ -5,87 +5,83 @@ const { Pool } = require('pg');
 const moment = require('moment');
 const pgp = require('pg-promise');
 
-const _connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
+class UserRepository {
+  constructor() {
+    this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
-const _pool = new Pool({
-  connectionString: _connectionString,
-});
+    this._pool = new Pool({
+      connectionString: this._connectionString,
+    });
 
-async function getAllUsers() {
-  'use strict';
-
-  const pgQuery = `
-      SELECT *
-      FROM ${process.env.USER_TABLE}
-    `;
-
-  return (await _pool.query(pgQuery)).rows;
-}
-
-async function searchUsers(query) {
-  'use strict';
-
-  const pgQuery = `
-      SELECT DISTINCT id, first_name, surname, tags
-      FROM (SELECT id, first_name, surname, tags, unnest(tags) AS unnestedTags
-        FROM ${process.env.USER_TABLE}) x
-      WHERE 
-      lower(first_name) LIKE $1 OR
-      lower(surname) LIKE $1 OR
-      lower(unnestedTags) LIKE $1
-    `;
-
-  return (await _pool.query(pgQuery, [`%${query}%`])).rows;
-}
-
-async function getUserByEmail(email) {
-  'use strict';
-
-  const pgQuery = `
-      SELECT *
-      FROM ${process.env.USER_TABLE}
-      WHERE email = $1
-    `;
-
-  const response = (await _pool.query(pgQuery, [email])).rows;
-
-  if (!response.length) {
-    return null;
+    this._table = process.env.USER_TABLE;
   }
 
-  return response[0];
-}
+  async getAllUsers() {
+    const pgQuery = `
+        SELECT *
+        FROM ${this._table}
+      `;
 
-async function createUser(newUser) {
-  'use strict';
+    return (await this._pool.query(pgQuery)).rows;
+  }
 
-  const { firstName, surname, email, password, tags } = newUser;
+  async searchUsers(query) {
+    const pgQuery = `
+        SELECT DISTINCT id, first_name, surname, tags
+        FROM (SELECT id, first_name, surname, tags, unnest(tags) AS unnestedTags
+          FROM ${this._table}) x
+        WHERE 
+        lower(first_name) LIKE $1 OR
+        lower(surname) LIKE $1 OR
+        lower(unnestedTags) LIKE $1
+      `;
 
-  const processedTags = tags ? `{${tags.join(', ')}}` : '{}';
+    return (await this._pool.query(pgQuery, [`%${query}%`])).rows;
+  }
 
-  const pgQuery = `
-      INSERT INTO ${process.env.USER_TABLE}
-      (id, first_name, surname, email, password, joined, tags)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+  async getUserByEmail(email) {
+    const pgQuery = `
+        SELECT *
+        FROM ${this._table}
+        WHERE email = $1
+      `;
+
+    const response = (await this._pool.query(pgQuery, [email])).rows;
+
+    if (!response.length) {
+      return null;
+    }
+
+    return response[0];
+  }
+
+  async createUser(newUser) {
+    const { firstName, surname, email, password, tags } = newUser;
+
+    const processedTags = tags ? `{${tags.join(', ')}}` : '{}';
+
+    const pgQuery = `
+        INSERT INTO ${this._table}
+        (id, first_name, surname, email, password, joined, tags)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `;
+
+    const newUUID = uuid.v4();
+
+    await this._pool.query(pgQuery, [newUUID, firstName, surname, email, password, moment.utc(), processedTags]);
+
+    return newUUID;
+  }
+
+  async verifyUserStatus(userId) {
+    const pgQuery = `
+    UPDATE ${this._table}
+    SET verified = 'true'
+    WHERE id = $1 
     `;
 
-  const newUUID = uuid.v4();
-
-  await _pool.query(pgQuery, [newUUID, firstName, surname, email, password, moment.utc(), processedTags]);
-
-  return newUUID;
-}
-
-async function verifyUserStatus(userId) {
-  'use strict';
-
-  const pgQuery = `
-  UPDATE ${process.env.USER_TABLE}
-  SET verified = 'true'
-  WHERE id = $1 
-  `
-
-  return await _pool.query(pgQuery, [userId]);
+    return await this._pool.query(pgQuery, [userId]);
+  }
 }
 
 //! debugging purposes only
@@ -96,10 +92,4 @@ async function verifyUserStatus(userId) {
 
 // console.log({ test });
 
-module.exports = {
-  getAllUsers,
-  searchUsers,
-  getUserByEmail,
-  createUser,
-  verifyUserStatus
-};
+module.exports = new UserRepository();

@@ -3,7 +3,6 @@ const passport = require('passport');
 class PassportMiddleware {
   authenticate(req, res, next) {
     passport.authenticate('local', { session: false }, (error, user, info) => {
-      'use strict';
       if (error) {
         res.status(500).send(error);
       }

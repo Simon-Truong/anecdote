@@ -1,14 +1,13 @@
 const _repo = require('../repository/verify-tokens.repository');
 
-async function createVerifyToken(newUserId) {
-  await _repo.createVerifyToken(newUserId);
+class VerifyTokensService {
+  async createVerifyToken(newUserId) {
+    await _repo.createVerifyToken(newUserId);
+  }
+
+  async verifyUser(userId, secretCode) {
+    return await _repo.verifyUser(userId, secretCode);
+  }
 }
 
-async function verifyUser(userId, secretCode) {
-  return await _repo.verifyUser(userId, secretCode);
-}
-
-module.exports = {
-  createVerifyToken,
-  verifyUser,
-};
+module.exports = new VerifyTokensService();

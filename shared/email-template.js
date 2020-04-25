@@ -1,8 +1,6 @@
 'use strict';
 
 class EmailTemplate {
-  'use strict';
-
   generateText(userId, firstName, secretCode) {
     return `
       Hi ${firstName.charAt(0).toUpperCase() + firstName.slice(1)},
