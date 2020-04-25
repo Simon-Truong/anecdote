@@ -76,6 +76,18 @@ async function createUser(newUser) {
   return newUUID;
 }
 
+async function verifyUserStatus(userId) {
+  'use strict';
+
+  const pgQuery = `
+  UPDATE ${process.env.USER_TABLE}
+  SET verified = 'true'
+  WHERE id = $1 
+  `
+
+  return await _pool.query(pgQuery, [userId]);
+}
+
 //! debugging purposes only
 // const test = pgp.as.format(
 //   `SQL query`,
@@ -89,4 +101,5 @@ module.exports = {
   searchUsers,
   getUserByEmail,
   createUser,
+  verifyUserStatus
 };

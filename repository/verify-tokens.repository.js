@@ -27,16 +27,19 @@ async function createVerifyToken(newUserId) {
   return secretCode;
 }
 
-async function getSecretByUserId(userId) {
+async function verifyUser(userId, secretCode) {
   'use strict';
 
   const pgQuery = `
-      SELECT *
+      SELECT id
       FROM ${process.env.VERIFY_TOKENS_TABLE}
-      WHERE userid = $1
+      WHERE 
+        userid = $1 AND
+        secret = $2 AND
+        expiry >= timestamp '${moment.utc().format()}'
     `;
 
-  const response = await (await _pool.query(pgQuery, [userId])).rows;
+  const response = await (await _pool.query(pgQuery, [userId, secretCode])).rows;
 
   if (!response.length) {
     return null;
@@ -47,5 +50,5 @@ async function getSecretByUserId(userId) {
 
 module.exports = {
   createVerifyToken,
-  getSecretByUserId,
+  verifyUser,
 };

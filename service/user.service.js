@@ -1,5 +1,6 @@
 'use strict';
-const _userRepo = require('../repository/user.repository');
+
+const _repo = require('../repository/user.repository');
 const _verifyTokensService = require('./verify-tokens.service');
 const _emailService = require('./email.service');
 const jwt = require('jsonwebtoken');
@@ -7,15 +8,13 @@ const bcrypt = require('bcrypt');
 
 async function getUsers(req, res) {
   'use strict';
-  _emailService.sendEmail('1234567890', 'me.simon_@hotmail.com', 'simon', 'sadfgh'); // TODO: remove this
-  return;
   const { q } = req.query;
 
   try {
     if (q) {
-      var result = await _userRepo.searchUsers(q);
+      var result = await _repo.searchUsers(q);
     } else {
-      var result = await _userRepo.getAllUsers();
+      var result = await _repo.getAllUsers();
     }
 
     res.send(result);
@@ -33,7 +32,7 @@ async function signUp(req, res) {
   const { body } = req;
 
   try {
-    var existentUser = await _userRepo.getUserByEmail(body.email);
+    var existentUser = await _repo.getUserByEmail(body.email);
   } catch (error) {
     console.log({ error });
     return res.status(500).send(error);
@@ -56,7 +55,7 @@ async function signUp(req, res) {
     newUser.password = hash;
 
     try {
-      const newUserId = await _userRepo.createUser(newUser);
+      const newUserId = await _repo.createUser(newUser);
 
       const secretCode = await _verifyTokensService.createVerifyToken(newUserId);
 
@@ -87,8 +86,35 @@ async function logIn(req, res) {
   res.status(200).send({ token });
 }
 
+async function verify(req, res) {
+  'use strict';
+
+  const { userId, secretCode } = req.body;
+
+  try {
+    var verifyToken = await _verifyTokensService.verifyUser(userId, secretCode);
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).send(error);
+  }
+
+  if (!verifyToken) {
+    return res.status(400).send('Code has expired or code is incorrect');
+  }
+
+  try {
+    await _repo.verifyUserStatus(userId);
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).send(error);
+  }
+
+  return res.status(200);
+}
+
 module.exports = {
   getUsers,
   signUp,
   logIn,
+  verify,
 };
