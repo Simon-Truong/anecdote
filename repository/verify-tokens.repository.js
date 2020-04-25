@@ -26,7 +26,7 @@ class VerifyTokensRepository {
 
     const secretCode = cryptoRandomString({ length: 10, type: 'base64' });
 
-    await _pool.query(pgQuery, [uuid.v4(), newUserId, secretCode, moment().add(1, 'h').utc()]);
+    await this._pool.query(pgQuery, [uuid.v4(), newUserId, secretCode, moment().add(1, 'h').utc()]);
 
     return secretCode;
   }
@@ -41,7 +41,7 @@ class VerifyTokensRepository {
           expiry >= timestamp '${moment.utc().format()}'
       `;
 
-    const response = await (await _pool.query(pgQuery, [userId, secretCode])).rows;
+    const response = await (await this._pool.query(pgQuery, [userId, secretCode])).rows;
 
     if (!response.length) {
       return null;
