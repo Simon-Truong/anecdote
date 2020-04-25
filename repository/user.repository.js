@@ -1,7 +1,6 @@
 'use strict';
 
 const uuid = require('uuid');
-const cryptoRandomString = require('crypto-random-string');
 const { Pool } = require('pg');
 const moment = require('moment');
 const pgp = require('pg-promise');
@@ -77,22 +76,6 @@ async function createUser(newUser) {
   return newUUID;
 }
 
-async function createVerifyToken(newUserId) {
-  'use strict';
-
-  const pgQuery = `
-    INSERT INTO ${process.env.VERIFY_TOKENS_TABLE}
-    (id, userid, secret, expiry)
-    VALUES ($1, $2, $3, $4)
-  `;
-
-  const secretCode = cryptoRandomString({ length: 10, type: 'base64' })
-
-  await _pool.query(pgQuery, [uuid.v4(), newUserId, secretCode, moment().add(1, 'h').utc()]);
-
-  return secretCode;
-}
-
 //! debugging purposes only
 // const test = pgp.as.format(
 //   `SQL query`,
@@ -106,5 +89,4 @@ module.exports = {
   searchUsers,
   getUserByEmail,
   createUser,
-  createVerifyToken
 };

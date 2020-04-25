@@ -18,7 +18,7 @@ const forSignUp = (req, res, next) => {
       .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
       .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
       .required(),
-    tags: Joi.array().sparse()
+    tags: Joi.array().sparse(),
   });
 
   schema
@@ -51,7 +51,27 @@ const forLogin = (req, res, next) => {
     });
 };
 
+const forVerification = (req, res, next) => {
+  'use-strict';
+
+  const schema = Joi.object({
+    userId: Joi.string().required(),
+    secretCode: Joi.string().required(),
+  });
+
+  schema
+    .validateAsync(req.body)
+    .then((response) => {
+      next();
+    })
+    .catch((error) => {
+      console.log({ error });
+      res.status(400).send(error.message);
+    });
+};
+
 module.exports = {
   forSignUp,
   forLogin,
+  forVerification,
 };

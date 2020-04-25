@@ -1,12 +1,13 @@
 'use strict';
 const _userRepo = require('../repository/user.repository');
+const _verifyTokensService = require('./verify-tokens.service');
 const _emailService = require('./email.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 async function getUsers(req, res) {
   'use strict';
-  _emailService.sendEmail('1234567890', 'me.simon_@hotmail.com', 'simon', 'sadfgh');
+  _emailService.sendEmail('1234567890', 'me.simon_@hotmail.com', 'simon', 'sadfgh'); // TODO: remove this
   return;
   const { q } = req.query;
 
@@ -57,7 +58,7 @@ async function signUp(req, res) {
     try {
       const newUserId = await _userRepo.createUser(newUser);
 
-      const secretCode = await _userRepo.createVerifyToken(newUserId);
+      const secretCode = await _verifyTokensService.createVerifyToken(newUserId);
 
       await _emailService.sendEmail(newUserId, newUser.email, newUser.firstName, secretCode);
     } catch (error) {

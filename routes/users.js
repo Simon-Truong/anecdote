@@ -19,4 +19,8 @@ router.post('/login', [validation.forLogin, passport.authenticate], async (req, 
   await _service.logIn(req, res);
 });
 
+router.post('/verify', validation.forVerification, async (req, res) => {
+  await _service.verify(req, res);
+});
+
 module.exports = router;
