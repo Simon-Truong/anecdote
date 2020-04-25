@@ -31,8 +31,8 @@ function sendEmail(userId, email, firstName, secretToken) {
     from: '<donotreply@anecdote.com.au>',
     to: email,
     subject: 'Sign Up',
-    text: 'Thank you for signing up to Anecdote', // TODO
-    html: emailTemplate.generate(userId, firstName, secretToken),
+    text: emailTemplate.generateText(userId, firstName, secretToken),
+    html: emailTemplate.generateHTML(userId, firstName, secretToken),
   };
 
   return new Promise((resolve, reject) => {

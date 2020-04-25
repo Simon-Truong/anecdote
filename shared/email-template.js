@@ -1,5 +1,17 @@
 class EmailTemplate {
-  generate(userId, firstName, secretToken) {
+  generateText(userId, firstName, secretToken) {
+    return `
+      Hi ${firstName.charAt(0).toUpperCase() + firstName.slice(1)},
+
+      Thank you for signing up to Anecdote.
+
+      Verify your account with the following code: ${secretToken}
+
+      ${process.env.CLIENT_URL}/verify/${userId}
+    `;
+  }
+
+  generateHTML(userId, firstName, secretToken) {``
     return `<!doctype html>
         <html>
           <head>
