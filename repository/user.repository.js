@@ -86,11 +86,11 @@ async function createVerifyToken(newUserId) {
     VALUES ($1, $2, $3, $4)
   `;
 
-  const secretToken = cryptoRandomString({ length: 10, type: 'base64' })
+  const secretCode = cryptoRandomString({ length: 10, type: 'base64' })
 
-  await _pool.query(pgQuery, [uuid.v4(), newUserId, secretToken, moment().add(1, 'h').utc()]);
+  await _pool.query(pgQuery, [uuid.v4(), newUserId, secretCode, moment().add(1, 'h').utc()]);
 
-  return secretToken;
+  return secretCode;
 }
 
 //! debugging purposes only

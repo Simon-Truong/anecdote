@@ -17,22 +17,22 @@ const mailTrap = {
   host: 'smtp.mailtrap.io',
   port: 2525,
   auth: {
-    user: '8496df82ba0789',
-    pass: 'af60ea0a91905e',
+    user: process.env.MAILTRAP_USER,
+    pass: process.env.MAILTRAP_PASSWORD,
   },
 };
 
 const emailClient = nodemailer.createTransport(mailTrap);
 
-function sendEmail(userId, email, firstName, secretToken) {
+function sendEmail(userId, email, firstName, secretCode) {
   'use strict';
 
   const emailOptions = {
     from: '<donotreply@anecdote.com.au>',
     to: email,
     subject: 'Sign Up',
-    text: emailTemplate.generateText(userId, firstName, secretToken),
-    html: emailTemplate.generateHTML(userId, firstName, secretToken),
+    text: emailTemplate.generateText(userId, firstName, secretCode),
+    html: emailTemplate.generateHTML(userId, firstName, secretCode),
   };
 
   return new Promise((resolve, reject) => {

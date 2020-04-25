@@ -6,8 +6,8 @@ const bcrypt = require('bcrypt');
 
 async function getUsers(req, res) {
   'use strict';
-  _emailService.sendEmail('1234567890','me.simon_@hotmail.com', 'simon', 'sadfgh')
-  return; 
+  _emailService.sendEmail('1234567890', 'me.simon_@hotmail.com', 'simon', 'sadfgh');
+  return;
   const { q } = req.query;
 
   try {
@@ -57,9 +57,9 @@ async function signUp(req, res) {
     try {
       const newUserId = await _userRepo.createUser(newUser);
 
-      const secretToken = await _userRepo.createVerifyToken(newUserId);
+      const secretCode = await _userRepo.createVerifyToken(newUserId);
 
-      await _emailService.sendEmail(newUserId, newUser.email, newUser.firstName, secretToken);
+      await _emailService.sendEmail(newUserId, newUser.email, newUser.firstName, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
