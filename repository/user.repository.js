@@ -2,7 +2,6 @@
 
 const uuid = require('uuid');
 const { Pool } = require('pg');
-const moment = require('moment');
 const pgp = require('pg-promise');
 
 class UserRepository {
@@ -63,12 +62,12 @@ class UserRepository {
     const pgQuery = `
         INSERT INTO ${this._table}
         (id, first_name, surname, email, password, joined, tags)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, now() at time zone 'utc', $6)
       `;
 
     const newUUID = uuid.v4();
 
-    await this._pool.query(pgQuery, [newUUID, firstName, surname, email, password, moment.utc(), processedTags]);
+    await this._pool.query(pgQuery, [newUUID, firstName, surname, email, password, processedTags]);
 
     return newUUID;
   }

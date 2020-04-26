@@ -3,7 +3,6 @@
 const { Pool } = require('pg');
 const pgp = require('pg-promise');
 const cryptoRandomString = require('crypto-random-string');
-const moment = require('moment');
 const uuid = require('uuid');
 
 class VerificationTokensRepository {
@@ -21,12 +20,12 @@ class VerificationTokensRepository {
     const pgQuery = `
         INSERT INTO ${this._table}
         (id, userid, secret, expiry)
-        VALUES ($1, $2, $3, $4)
+        VALUES ($1, $2, $3, (now() + interval '1h') at time zone 'utc')
       `;
 
     const secretCode = cryptoRandomString({ length: 10, type: 'base64' });
 
-    await this._pool.query(pgQuery, [uuid.v4(), newUserId, secretCode, moment().add(1, 'h').utc()]);
+    await this._pool.query(pgQuery, [uuid.v4(), newUserId, secretCode]);
 
     return secretCode;
   }
@@ -38,7 +37,7 @@ class VerificationTokensRepository {
         WHERE 
           userid = $1 AND
           secret = $2 AND
-          expiry >= timestamp '${moment.utc().format()}'
+          expiry >= now() at time zone 'utc'
       `;
 
     const response = await (await this._pool.query(pgQuery, [userId, secretCode])).rows;
