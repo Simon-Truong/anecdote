@@ -1,7 +1,7 @@
 'use strict';
 
 const _repo = require('../repository/user.repository');
-const _verifyTokensService = require('./verify-tokens.service');
+const _verificationTokensService = require('./verify-tokens.service');
 const _emailService = require('./email.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -17,13 +17,13 @@ class UserService {
         var result = await _repo.getAllUsers();
       }
 
-      res.send(result);
+      return res.send(result);
     } catch (error) {
       console.log({
         error,
       });
 
-      res.status(400).send(error);
+      return res.status(400).send(error);
     }
   }
 
@@ -56,7 +56,7 @@ class UserService {
       try {
         const newUserId = await _repo.createUser(newUser);
 
-        const secretCode = await _verifyTokensService.createVerifyToken(newUserId);
+        const secretCode = await _verificationTokensService.createVerificationToken(newUserId);
 
         await _emailService.sendEmail(newUserId, newUser.email, newUser.firstName, secretCode);
       } catch (error) {
@@ -81,20 +81,20 @@ class UserService {
       process.env.JWT_SECRET
     );
 
-    res.status(200).send({ token });
+    return res.status(200).send({ token });
   }
 
   async verify(req, res) {
     const { userId, secretCode } = req.body;
 
     try {
-      var verifyToken = await _verifyTokensService.verifyUser(userId, secretCode);
+      var verificationToken = await _verificationTokensService.verifyUser(userId, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
-    if (!verifyToken) {
+    if (!verificationToken) {
       return res.status(400).send('Code has expired or code is incorrect');
     }
 

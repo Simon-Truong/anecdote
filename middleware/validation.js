@@ -27,7 +27,7 @@ class ValidationMiddleware {
       })
       .catch((error) => {
         console.log({ error });
-        res.status(400).send(error.message);
+        return res.status(400).send(error.message);
       });
   }
 
@@ -44,7 +44,7 @@ class ValidationMiddleware {
       })
       .catch((error) => {
         console.log({ error });
-        res.status(400).send(error.message);
+        return res.status(400).send(error.message);
       });
   }
 
@@ -61,7 +61,7 @@ class ValidationMiddleware {
       })
       .catch((error) => {
         console.log({ error });
-        res.status(400).send(error.message);
+        return res.status(400).send(error.message);
       });
   }
 }

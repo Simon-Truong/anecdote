@@ -6,7 +6,7 @@ const cryptoRandomString = require('crypto-random-string');
 const moment = require('moment');
 const uuid = require('uuid');
 
-class VerifyTokensRepository {
+class VerificationTokensRepository {
   constructor() {
     this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
@@ -14,10 +14,10 @@ class VerifyTokensRepository {
       connectionString: this._connectionString,
     });
 
-    this._table = process.env.VERIFY_TOKENS_TABLE;
+    this._table = process.env.VERIFICATION_TOKENS_TABLE;
   }
 
-  async createVerifyToken(newUserId) {
+  async createVerificationToken(newUserId) {
     const pgQuery = `
         INSERT INTO ${this._table}
         (id, userid, secret, expiry)
@@ -51,4 +51,4 @@ class VerifyTokensRepository {
   }
 }
 
-module.exports = new VerifyTokensRepository();
+module.exports = new VerificationTokensRepository();

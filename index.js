@@ -1,7 +1,7 @@
 'use strict';
 
 require('dotenv').config();
-require('./authentication/passport-strategy');
+require('./strategies/passport-strategy');
 
 const express = require('express');
 const port = process.env.PORT || 3000;

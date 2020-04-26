@@ -4,11 +4,15 @@ class PassportMiddleware {
   authenticate(req, res, next) {
     passport.authenticate('local', { session: false }, (error, user, info) => {
       if (error) {
-        res.status(500).send(error);
+        return res.status(500).send(error);
       }
 
       if (!user) {
-        res.status(400).send(info.message);
+        return res.status(400).send(info.message);
+      }
+
+      if (!user.verified) {
+        return res.status(401).send('Email is not verified');
       }
 
       req.userId = user.id;
