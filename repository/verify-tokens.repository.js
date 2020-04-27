@@ -19,7 +19,7 @@ class VerificationTokensRepository {
   async createVerificationToken(newUserId) {
     const pgQuery = `
         INSERT INTO ${this._table}
-        (id, userid, secret, expiry)
+        (id, user_id, secret, expiry)
         VALUES ($1, $2, $3, (now() + interval '1h') at time zone 'utc')
       `;
 
@@ -35,7 +35,7 @@ class VerificationTokensRepository {
         SELECT id
         FROM ${this._table}
         WHERE 
-          userid = $1 AND
+          user_id = $1 AND
           secret = $2 AND
           expiry >= now() at time zone 'utc'
       `;

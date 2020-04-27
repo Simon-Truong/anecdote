@@ -64,7 +64,7 @@ class UserService {
         return res.status(500).send(error);
       }
 
-      return res.status(200);
+      return res.status(200).send('Successfully signed up');
     });
   }
 
