@@ -38,8 +38,8 @@ class UserService {
     }
 
     if (existentUser) {
-      console.log('Email is already in user.');
-      return res.status(400).send('Email is already in use.');
+      console.log('Email is already in use');
+      return res.status(400).send('Email is already in use');
     }
 
     const SALT_ROUNDS = 10;
@@ -47,7 +47,7 @@ class UserService {
     bcrypt.hash(body.password, SALT_ROUNDS, async (error, hash) => {
       if (error) {
         console.log({ error });
-        return res.status(500);
+        return res.status(500).send(error);
       }
 
       const newUser = body;
@@ -64,7 +64,11 @@ class UserService {
         return res.status(500).send(error);
       }
 
+<<<<<<< HEAD
       return res.status(200).send('Successfully signed up');
+=======
+      return res.status(200).send('You have sucessfully signed up, please verify your email');
+>>>>>>> b65f1af7da490100e769aae18238584c738488cd
     });
   }
 
@@ -105,7 +109,7 @@ class UserService {
       return res.status(500).send(error);
     }
 
-    return res.status(200);
+    return res.status(200).send('Successfully verified');
   }
 }
 
