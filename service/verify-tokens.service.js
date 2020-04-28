@@ -8,6 +8,10 @@ class VerificationTokensService {
   async verifyUser(userId, secretCode) {
     return await _repo.verifyUser(userId, secretCode);
   }
+
+  async updateVerificationToken(id) {
+    return await _repo.updateVerificationToken(id);
+  }
 }
 
 module.exports = new VerificationTokensService();

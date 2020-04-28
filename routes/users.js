@@ -23,4 +23,8 @@ router.post('/verify', validation.forVerification, async (req, res) => {
   await _userService.verify(req, res);
 });
 
+router.post('/resendCode', validation.forResendCode, async (req, res) => {
+  await _userService.resendCode(req, res);
+});
+
 module.exports = router;

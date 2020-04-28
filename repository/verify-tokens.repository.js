@@ -40,13 +40,27 @@ class VerificationTokensRepository {
           expiry >= now() at time zone 'utc'
       `;
 
-    const response = await (await this._pool.query(pgQuery, [userId, secretCode])).rows;
+    const response = (await this._pool.query(pgQuery, [userId, secretCode])).rows;
 
     if (!response.length) {
       return null;
     }
 
     return response[0];
+  }
+
+  async updateVerificationToken(id) {
+    const pgQuery = `
+      UPDATE ${this._table}
+      SET secret = $1, expiry = (now() + interval '1h') at time zone 'utc'
+      WHERE id = $2
+    `;
+
+    const newSecret = cryptoRandomString({ length: 10, type: 'base64' });
+
+    await this._pool.query(pgQuery, [newSecret, id]);
+
+    return newSecret;
   }
 }
 

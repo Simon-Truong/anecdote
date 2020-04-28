@@ -107,6 +107,31 @@ class UserService {
 
     return res.status(200).send('Successfully verified');
   }
+
+  async resendCode(req, res) {
+    const { email } = req.body;
+
+    try {
+      var { verificationtokenid, userid, first_name } = await _repo.findVerificationTokenIdByEmail(email);
+    } catch (error) {
+      console.log({ error });
+      return res.status(500).send(error);
+    }
+
+    if (!verificationtokenid) {
+      return res.status(400).send('Email does not exist');
+    }
+
+    try {
+      const newSecret = await _verificationTokensService.updateVerificationToken(verificationtokenid);
+      await _emailService.sendEmail(userid, email, first_name, newSecret);
+    } catch (error) {
+      console.log({ error });
+      return res.status(500).send(error);
+    }
+
+    return res.status(200).send('Successfully sent new code to email');
+  }
 }
 
 module.exports = new UserService();

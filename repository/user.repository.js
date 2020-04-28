@@ -13,6 +13,7 @@ class UserRepository {
     });
 
     this._table = process.env.USER_TABLE;
+    this._verificationTokenTable = process.env.VERIFICATION_TOKENS_TABLE;
   }
 
   async getAllUsers() {
@@ -74,12 +75,29 @@ class UserRepository {
 
   async verifyUserStatus(userId) {
     const pgQuery = `
-    UPDATE ${this._table}
-    SET verified = 'true'
-    WHERE id = $1 
+      UPDATE ${this._table}
+      SET verified = 'true'
+      WHERE id = $1 
     `;
 
     return await this._pool.query(pgQuery, [userId]);
+  }
+
+  async findVerificationTokenIdByEmail(email) {
+    const pgQuery = `
+      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name
+      FROM ${this._table}
+      INNER JOIN ${this._verificationTokenTable} ON ${this._verificationTokenTable}.user_id = ${this._table}.id
+      WHERE email = $1
+    `;
+
+    const response = (await this._pool.query(pgQuery, [email])).rows;
+
+    if (!response.length) {
+      return null;
+    }
+
+    return response[0];
   }
 }
 
