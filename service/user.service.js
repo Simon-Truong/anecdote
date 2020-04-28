@@ -5,6 +5,7 @@ const _verificationTokensService = require('./verify-tokens.service');
 const _emailService = require('./email.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 
 class UserService {
   async getUsers(req, res) {
@@ -88,15 +89,17 @@ class UserService {
     const { userId, secretCode } = req.body;
 
     try {
-      var verificationToken = await _verificationTokensService.verifyUser(userId, secretCode);
+      var response = await _verificationTokensService.verifyUser(userId, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
-    if (!verificationToken) {
-      return res.status(400).send('Code has expired or code is incorrect');
+    if (!response) {
+      return res.status(400).send('Code is incorrect');
     }
+
+    const {expiry} = response;
 
     try {
       await _repo.verifyUserStatus(userId);

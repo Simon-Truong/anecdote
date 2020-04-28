@@ -32,12 +32,11 @@ class VerificationTokensRepository {
 
   async verifyUser(userId, secretCode) {
     const pgQuery = `
-        SELECT id
+        SELECT expiry
         FROM ${this._table}
         WHERE 
           user_id = $1 AND
-          secret = $2 AND
-          expiry >= now() at time zone 'utc'
+          secret = $2
       `;
 
     const response = (await this._pool.query(pgQuery, [userId, secretCode])).rows;
