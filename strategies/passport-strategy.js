@@ -12,16 +12,16 @@ passport.use(
       var user = await _repo.getUserByEmail(email);
     } catch (error) {
       console.log({ error });
-      done(error, false);
+      return done(error, false);
     }
 
     if (!user) {
-      done(null, false, { message: 'Email or Password is incorrect' });
+      return done(null, false, { message: 'Email or Password is incorrect' });
     }
 
     bcrypt.compare(password, user.password, (error, result) => {
       if (error || !result) {
-        done(null, false, { message: 'Email or Password is incorrect' });
+        return done(null, false, { message: 'Email or Password is incorrect' });
       }
 
       done(null, user, { message: 'Successfully logged in' });

@@ -85,7 +85,7 @@ class UserRepository {
 
   async findVerificationTokenIdByEmail(email) {
     const pgQuery = `
-      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name
+      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name, verified
       FROM ${this._table}
       INNER JOIN ${this._verificationTokenTable} ON ${this._verificationTokenTable}.user_id = ${this._table}.id
       WHERE email = $1

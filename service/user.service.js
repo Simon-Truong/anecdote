@@ -112,14 +112,20 @@ class UserService {
     const { email } = req.body;
 
     try {
-      var { verificationtokenid, userid, first_name } = await _repo.findVerificationTokenIdByEmail(email);
+      var response = await _repo.findVerificationTokenIdByEmail(email);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
-    if (!verificationtokenid) {
+    if (!response) {
       return res.status(400).send('Email does not exist');
+    }
+
+    const { verificationtokenid, userid, first_name, verified } = response;
+
+    if (verified) {
+      return res.status(400).send('Email already verified');
     }
 
     try {
