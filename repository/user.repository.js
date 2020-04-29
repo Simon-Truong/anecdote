@@ -85,13 +85,30 @@ class UserRepository {
 
   async findVerificationTokenIdByEmail(email) {
     const pgQuery = `
-      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name, verified
+      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name, verified, email
       FROM ${this._table}
       INNER JOIN ${this._verificationTokenTable} ON ${this._verificationTokenTable}.user_id = ${this._table}.id
       WHERE email = $1
     `;
 
     const response = (await this._pool.query(pgQuery, [email])).rows;
+
+    if (!response.length) {
+      return null;
+    }
+
+    return response[0];
+  }
+
+  async findVerificationTokenByUserId(userId) {
+    const pgQuery = `
+      SELECT ${this._verificationTokenTable}.id AS verificationTokenId, ${this._table}.id AS userId, first_name, verified, email
+      FROM ${this._table}
+      INNER JOIN ${this._verificationTokenTable} ON ${this._verificationTokenTable}.user_id = ${this._table}.id
+      WHERE ${this._table}.id = $1
+    `;
+
+    const response = (await this._pool.query(pgQuery, [userId])).rows;
 
     if (!response.length) {
       return null;

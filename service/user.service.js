@@ -116,20 +116,30 @@ class UserService {
   }
 
   async resendCode(req, res) {
-    const { email } = req.body;
+    const { email: requestEmail, userId } = req.body;
 
     try {
-      var response = await _repo.findVerificationTokenIdByEmail(email);
+      if (requestEmail) {
+        var response = await _repo.findVerificationTokenIdByEmail(requestEmail);
+      }
+
+      if (userId) {
+        var response = await _repo.findVerificationTokenByUserId(userId);
+      }
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
-    if (!response) {
+    if (!response && requestEmail) {
       return res.status(400).send('Email does not exist');
     }
 
-    const { verificationtokenid, userid, first_name, verified } = response;
+    if (!response && userId) {
+      return res.status(400).send('User does not exist');
+    }
+
+    const { verificationtokenid, userid, first_name, verified, email } = response;
 
     if (verified) {
       return res.status(400).send('Email already verified');

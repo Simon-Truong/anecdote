@@ -67,8 +67,9 @@ class ValidationMiddleware {
 
   forResendCode(req, res, next) {
     const schema = Joi.object({
-      email: Joi.string().email().required(),
-    });
+      email: Joi.string().email(),
+      userId: Joi.string()
+    }).xor('email', 'userId');
 
     schema
       .validateAsync(req.body)
