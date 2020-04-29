@@ -99,7 +99,11 @@ class UserService {
       return res.status(400).send('Code is incorrect');
     }
 
-    const {expiry} = response;
+    const { expiry } = response;
+
+    if (!moment.utc().isBefore(expiry)) {
+      return res.status(400).send('Code has expired');
+    }
 
     try {
       await _repo.verifyUserStatus(userId);
