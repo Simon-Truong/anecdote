@@ -102,7 +102,7 @@ class UserService {
     const { expiry } = response;
 
     if (!moment.utc().isBefore(expiry)) {
-      return res.status(400).send('Code has expired');
+      return res.status(400).send('Code has expired, please resend code');
     }
 
     try {
