@@ -12,7 +12,7 @@ class PassportMiddleware {
       }
 
       if (!user.verified) {
-        return res.status(401).send('Email is not verified');
+        return res.status(401).send('Email is not verified, resend code?');
       }
 
       req.userId = user.id;

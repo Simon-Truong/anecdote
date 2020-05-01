@@ -50,7 +50,9 @@ class ValidationMiddleware {
 
   forVerification(req, res, next) {
     const schema = Joi.object({
-      userId: Joi.string().required(),
+      userId: Joi.string()
+        .guid({ version: ['uuidv4'] })
+        .required(),
       secretCode: Joi.string().required(),
     });
 
@@ -68,7 +70,7 @@ class ValidationMiddleware {
   forResendCode(req, res, next) {
     const schema = Joi.object({
       email: Joi.string().email(),
-      userId: Joi.string()
+      userId: Joi.string().guid({ version: ['uuidv4'] }),
     }).xor('email', 'userId');
 
     schema
