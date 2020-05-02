@@ -28,7 +28,7 @@ class UserRepository {
   async searchUsers(query) {
     const pgQuery = `
         SELECT DISTINCT id, first_name, surname, tags
-        FROM (SELECT id, first_name, surname, tags, unnest(tags) AS unnestedTags
+        FROM (SELECT id, first_name, surname, tags, unnest(CASE WHEN "tags" <> '{}' THEN "tags" ELSE '{null}' END) AS unnestedTags
           FROM ${this._table}) x
         WHERE 
         lower(first_name) LIKE $1 OR

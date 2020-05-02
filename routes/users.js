@@ -8,7 +8,7 @@ const _userService = require('../service/user.service');
 
 const router = express.Router();
 
-router.get('/users', async (req, res) => {
+router.get('/users', lowerCase.forSearch, async (req, res) => {
   await _userService.getUsers(req, res);
 });
 
