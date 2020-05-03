@@ -17,7 +17,8 @@ class ValidationMiddleware {
         .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
         .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
         .required(),
-      tags: Joi.array().sparse(),
+      confirmPassword: Joi.ref('password'),
+      tags: Joi.array().sparse()
     });
 
     schema
