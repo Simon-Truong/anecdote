@@ -1,16 +1,13 @@
 'use strict';
 
 const uuid = require('uuid');
-const { Pool } = require('pg');
 const pgp = require('pg-promise');
 
-class UserRepository {
-  constructor() {
-    this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
+const BaseRepository = require('./base.repository');
 
-    this._pool = new Pool({
-      connectionString: this._connectionString,
-    });
+class UserRepository extends BaseRepository {
+  constructor() {
+    super();
 
     this._table = process.env.USER_TABLE;
     this._verificationTokenTable = process.env.VERIFICATION_TOKENS_TABLE;

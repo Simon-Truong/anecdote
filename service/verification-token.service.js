@@ -1,4 +1,4 @@
-const _repo = require('../repository/verify-tokens.repository');
+const _repo = require('../repository/verify-token.repository');
 
 class VerificationTokensService {
   async createVerificationToken(newUserId) {

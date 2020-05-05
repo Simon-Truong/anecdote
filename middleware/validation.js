@@ -84,6 +84,22 @@ class ValidationMiddleware {
         return res.status(400).send(error.message);
       });
   }
+
+  forResetPassword(req, res, next) {
+    const schema = Joi.object({
+      email: Joi.string().trim().email().required(),
+    });
+
+    schema
+      .validateAsync(req.body)
+      .then((response) => {
+        next();
+      })
+      .catch((error) => {
+        console.log({ error });
+        return res.status(400).send(error.message);
+      });
+  }
 }
 
 module.exports = new ValidationMiddleware();

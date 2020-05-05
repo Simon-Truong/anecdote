@@ -27,13 +27,33 @@ class EmailService {
     this.emailClient = nodemailer.createTransport(mailTrap);
   }
 
-  sendEmail(userId, email, firstName, secretCode) {
+  sendVerificationEmail(userId, email, firstName, secretCode) {
     const emailOptions = {
       from: '<donotreply@anecdote.com.au>',
       to: email,
       subject: 'Sign Up',
-      text: emailTemplate.generateText(userId, firstName, secretCode),
-      html: emailTemplate.generateHTML(userId, firstName, secretCode),
+      text: emailTemplate.generateTextForSignup(userId, firstName, secretCode),
+      html: emailTemplate.generateHTMLForSignup(userId, firstName, secretCode),
+    };
+
+    return new Promise((resolve, reject) => {
+      this.emailClient.sendMail(emailOptions, (err, info) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(info);
+        }
+      });
+    });
+  }
+
+  sendResetPasswordEmail(email, firstName, secret) {
+    const emailOptions = {
+      from: '<donotreply@anecdote.com.au>',
+      to: email,
+      subject: 'Password Reset',
+      text: emailTemplate.generateTextForPasswordReset(firstName, secret),
+      html: emailTemplate.generateHTMLForPasswordReset(firstName, secret),
     };
 
     return new Promise((resolve, reject) => {

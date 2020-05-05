@@ -1,8 +1,9 @@
 'use strict';
 
 const _repo = require('../repository/user.repository');
-const _verificationTokensService = require('./verify-tokens.service');
+const _verificationTokenService = require('./verification-token.service');
 const _emailService = require('./email.service');
+const _passwordTokenService = require('./password-token.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
@@ -57,9 +58,9 @@ class UserService {
       try {
         const newUserId = await _repo.createUser(newUser);
 
-        const secretCode = await _verificationTokensService.createVerificationToken(newUserId);
+        const secretCode = await _verificationTokenService.createVerificationToken(newUserId);
 
-        await _emailService.sendEmail(newUserId, newUser.email, newUser.firstName, secretCode);
+        await _emailService.sendVerificationEmail(newUserId, newUser.email, newUser.firstName, secretCode);
       } catch (error) {
         console.log({ error });
         return res.status(500).send(error);
@@ -89,7 +90,7 @@ class UserService {
     const { userId, secretCode } = req.body;
 
     try {
-      var response = await _verificationTokensService.verifyUser(userId, secretCode);
+      var response = await _verificationTokenService.verifyUser(userId, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
@@ -146,14 +147,40 @@ class UserService {
     }
 
     try {
-      const newSecret = await _verificationTokensService.updateVerificationToken(verificationtokenid);
-      await _emailService.sendEmail(userid, email, first_name, newSecret);
+      const newSecret = await _verificationTokenService.updateVerificationToken(verificationtokenid);
+      await _emailService.sendVerificationEmail(userid, email, first_name, newSecret);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
     return res.status(200).send('Successfully sent new code to email');
+  }
+
+  async resetPassword(req, res) {
+    const { email } = req.body;
+
+    try {
+      var existentUser = await _repo.getUserByEmail(email);
+    } catch (error) {
+      console.log({error});
+      return res.status(500).send(error);
+    }
+
+    if (!existentUser) {
+      return res.status(400).send('Email does not exists');
+    }
+
+    try {
+      var secret = await _passwordTokenService.createPasswordToken(existentUser.id);      
+    } catch (error) {
+      console.log({error});
+      return res.status(500).send(error);
+    }
+
+    await _emailService.sendResetPasswordEmail(existentUser.email, existentUser.first_name, secret);
+
+    res.status(200).send('Reset password email sent');
   }
 }
 

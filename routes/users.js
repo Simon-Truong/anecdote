@@ -28,4 +28,8 @@ router.post('/resendCode', [validation.forResendCode, lowerCase.forResendCode], 
   await _userService.resendCode(req, res);
 });
 
+router.post('/resetPassword', [validation.forResetPassword, lowerCase.forResetPassword], async (req, res) => {
+  await _userService.resetPassword(req, res);
+});
+
 module.exports = router;
