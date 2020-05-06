@@ -171,8 +171,16 @@ class UserService {
       return res.status(400).send('Email does not exists');
     }
 
+    const userId = existentUser.id;
+
     try {
-      var secret = await _passwordTokenService.createPasswordToken(existentUser.id);      
+      const existentPasswordToken = await _passwordTokenService.getPasswordTokenbyUserId(userId);
+
+      if (existentPasswordToken) {
+        var secret = await _passwordTokenService.updatePasswordToken(existentPasswordToken.id)
+      } else {
+        var secret = await _passwordTokenService.createPasswordToken(userId);      
+      }
     } catch (error) {
       console.log({error});
       return res.status(500).send(error);
