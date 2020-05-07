@@ -47,8 +47,8 @@ class LowerCase {
         next();
     }
 
-    forResetPassword(req, res, next) {
-        // TODO: why can't I use forLogin?
+    forRequestResetPassword(req, res, next) {
+        // ? why can't I use forLogin?
         const { body } = req;
         const { email } = body;
 

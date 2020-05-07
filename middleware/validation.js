@@ -85,7 +85,7 @@ class ValidationMiddleware {
       });
   }
 
-  forResetPassword(req, res, next) {
+  forRequestResetPassword(req, res, next) {
     const schema = Joi.object({
       email: Joi.string().trim().email().required(),
     });

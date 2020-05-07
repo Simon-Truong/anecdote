@@ -157,7 +157,7 @@ class UserService {
     return res.status(200).send('Successfully sent new code to email');
   }
 
-  async resetPassword(req, res) {
+  async requestResetPassword(req, res) {
     const { email } = req.body;
 
     try {
