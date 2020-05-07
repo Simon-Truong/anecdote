@@ -32,4 +32,8 @@ router.post('/requestResetPassword', [validation.forRequestResetPassword, lowerC
   await _userService.requestResetPassword(req, res);
 });
 
+router.post('/resetPassword', (req, res) => {
+  
+})
+
 module.exports = router;
