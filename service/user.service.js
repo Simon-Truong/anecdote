@@ -92,17 +92,17 @@ class UserService {
     const { userId, secretCode } = req.body;
 
     try {
-      var response = await _verificationTokenService.getVerificationToken(userId, secretCode);
+      var verificationToken = await _verificationTokenService.getVerificationToken(userId, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
     }
 
-    if (!response) {
+    if (!verificationToken) {
       return res.status(400).send('Code is incorrect');
     }
 
-    const { expiry } = response;
+    const { expiry } = verificationToken;
 
     if (!moment.utc().isBefore(expiry)) {
       return res.status(400).send('Code has expired, please resend code');
