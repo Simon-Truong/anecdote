@@ -47,13 +47,13 @@ class EmailService {
     });
   }
 
-  sendResetPasswordEmail(email, firstName, secret) {
+  sendResetPasswordEmail(userId, email, firstName, secretCode) {
     const emailOptions = {
       from: '<donotreply@anecdote.com.au>',
       to: email,
       subject: 'Password Reset',
-      text: emailTemplate.generateTextForPasswordReset(firstName, secret),
-      html: emailTemplate.generateHTMLForPasswordReset(firstName, secret),
+      text: emailTemplate.generateTextForPasswordReset(userId, firstName, secretCode),
+      html: emailTemplate.generateHTMLForPasswordReset(userId, firstName, secretCode),
     };
 
     return new Promise((resolve, reject) => {

@@ -27,7 +27,7 @@ class VerificationTokensRepository extends BaseRepository {
     return secretCode;
   }
 
-  async verifyUser(userId, secretCode) {
+  async getVerificationToken(userId, secretCode) {
     const pgQuery = `
         SELECT expiry
         FROM ${this._table}

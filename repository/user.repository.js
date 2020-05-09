@@ -113,6 +113,16 @@ class UserRepository extends BaseRepository {
 
     return response[0];
   }
+
+  async updateUserPassword(userId, newPassword) {
+    const pgQuery = `
+      UPDATE ${this._table}
+      SET password = $1
+      WHERE id = $2
+    `;
+
+    await this._pool.query(pgQuery, [newPassword, userId]);
+  }
 }
 
 //! debugging purposes only

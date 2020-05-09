@@ -5,8 +5,8 @@ class VerificationTokensService {
     return await _repo.createVerificationToken(newUserId);
   }
 
-  async verifyUser(userId, secretCode) {
-    return await _repo.verifyUser(userId, secretCode);
+  async getVerificationToken(userId, secretCode) {
+    return await _repo.getVerificationToken(userId, secretCode);
   }
 
   async updateVerificationToken(id) {
