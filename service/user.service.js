@@ -9,6 +9,10 @@ const bcrypt = require('bcrypt');
 const moment = require('moment');
 
 class UserService {
+  constructor() {
+    this.SALT_ROUNDS = 10;
+  }
+
   async getUsers(req, res) {
     const { q } = req.query;
 
@@ -44,9 +48,7 @@ class UserService {
       return res.status(400).send('Email is already in use');
     }
 
-    const SALT_ROUNDS = 10;
-
-    bcrypt.hash(body.password, SALT_ROUNDS, async (error, hash) => {
+    bcrypt.hash(body.password, this.SALT_ROUNDS, async (error, hash) => {
       if (error) {
         console.log({ error });
         return res.status(500).send(error);
@@ -60,7 +62,7 @@ class UserService {
 
         const secretCode = await _verificationTokenService.createVerificationToken(newUserId);
 
-        await _emailService.sendVerificationEmail(newUserId, newUser.email, newUser.firstName, secretCode);
+        _emailService.sendVerificationEmail(newUserId, newUser.email, newUser.firstName, secretCode);
       } catch (error) {
         console.log({ error });
         return res.status(500).send(error);
@@ -90,7 +92,7 @@ class UserService {
     const { userId, secretCode } = req.body;
 
     try {
-      var response = await _verificationTokenService.verifyUser(userId, secretCode);
+      var response = await _verificationTokenService.getVerificationToken(userId, secretCode);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
@@ -148,7 +150,7 @@ class UserService {
 
     try {
       const newSecret = await _verificationTokenService.updateVerificationToken(verificationtokenid);
-      await _emailService.sendVerificationEmail(userid, email, first_name, newSecret);
+      _emailService.sendVerificationEmail(userid, email, first_name, newSecret);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
@@ -163,7 +165,7 @@ class UserService {
     try {
       var existentUser = await _repo.getUserByEmail(email);
     } catch (error) {
-      console.log({error});
+      console.log({ error });
       return res.status(500).send(error);
     }
 
@@ -177,18 +179,53 @@ class UserService {
       const existentPasswordToken = await _passwordTokenService.getPasswordTokenbyUserId(userId);
 
       if (existentPasswordToken) {
-        var secret = await _passwordTokenService.updatePasswordToken(existentPasswordToken.id)
+        var secretCode = await _passwordTokenService.updatePasswordToken(existentPasswordToken.id);
       } else {
-        var secret = await _passwordTokenService.createPasswordToken(userId);      
+        var secretCode = await _passwordTokenService.createPasswordToken(userId);
       }
     } catch (error) {
-      console.log({error});
+      console.log({ error });
       return res.status(500).send(error);
     }
 
-    await _emailService.sendResetPasswordEmail(existentUser.email, existentUser.first_name, secret);
+    _emailService.sendResetPasswordEmail(existentUser.id, existentUser.email, existentUser.first_name, secretCode);
 
     res.status(200).send('Reset password email sent');
+  }
+
+  async resetPassword(req, res) {
+    const { userId, secretCode, password } = req.body;
+
+    try {
+      var existentPasswordToken = await _passwordTokenService.getPasswordToken(userId, secretCode);
+    } catch (error) {
+      console.log({ error });
+      return res.status(500).send(error);
+    }
+
+    if (!existentPasswordToken) {
+      return res.status(400).send('Code is incorrect');
+    }
+
+    if (!moment.utc().isBefore(existentPasswordToken.expiry)) {
+      return res.status(400).send('Code has expired, reset your password again?');
+    }
+
+    bcrypt.hash(password, this.SALT_ROUNDS, async (error, hash) => {
+      if (error) {
+        console.log({ error });
+        return res.status(500).send(error);
+      }
+
+      try {
+        await _repo.updateUserPassword(existentPasswordToken.user_id, hash);
+      } catch (error) {
+        console.log({ error });
+        return res.status(500).send(error);
+      }
+
+      return res.status(200).send('You have sucessfully resetted your password');
+    });
   }
 }
 

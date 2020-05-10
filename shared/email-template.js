@@ -44,7 +44,7 @@ class EmailTemplate {
     return this.generateHTMLTemplate(slot);
   }
 
-  generateTextForPasswordReset(firstName, secret) {
+  generateTextForPasswordReset(userId, firstName, secret) {
     return `
       Hi ${capitalCase(firstName)},
 
@@ -58,12 +58,13 @@ class EmailTemplate {
     `;
   }
 
-  generateHTMLForPasswordReset(firstName, secret) {
+  generateHTMLForPasswordReset(userId, firstName, secretCode) {
     const slot = `
     <tr>
       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Hi <strong>${capitalCase(firstName)}</strong>,</p>
         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">You have requested to reset your password.</p>
+        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Reset your password with the following code: <strong>${secretCode}</strong></p>
         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
           <tbody>
             <tr>
@@ -71,7 +72,7 @@ class EmailTemplate {
                 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
                   <tbody>
                     <tr>
-                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #1976d2; border-radius: 5px; text-align: center;"> <a href="${process.env.CLIENT_URL}/resetPassword/${secret}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #1976d2; border: solid 1px #1976d2; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 5px 10px; text-transform: capitalize; border-color: #1976d2;">Change Password</a> </td>
+                      <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; background-color: #1976d2; border-radius: 5px; text-align: center;"> <a href="${process.env.CLIENT_URL}/resetPassword/${userId}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #1976d2; border: solid 1px #1976d2; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 5px 10px; text-transform: capitalize; border-color: #1976d2;">Reset Password</a> </td>
                     </tr>
                   </tbody>
                 </table>

@@ -15,10 +15,10 @@ class ValidationMiddleware {
         .pattern(new RegExp(/[a-z]/))
         .pattern(new RegExp(/[0-9]/))
         .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
-        .pattern(new RegExp(`^((?!${firstName}|${surname}|${email}).)*$`))
+        .min(8)
         .required(),
       confirmPassword: Joi.ref('password'),
-      tags: Joi.array().sparse()
+      tags: Joi.array().sparse(),
     });
 
     schema
@@ -51,7 +51,8 @@ class ValidationMiddleware {
 
   forVerification(req, res, next) {
     const schema = Joi.object({
-      userId: Joi.string().trim()
+      userId: Joi.string()
+        .trim()
         .guid({ version: ['uuidv4'] })
         .required(),
       secretCode: Joi.string().trim().required(),
@@ -88,6 +89,31 @@ class ValidationMiddleware {
   forRequestResetPassword(req, res, next) {
     const schema = Joi.object({
       email: Joi.string().trim().email().required(),
+    });
+
+    schema
+      .validateAsync(req.body)
+      .then((response) => {
+        next();
+      })
+      .catch((error) => {
+        console.log({ error });
+        return res.status(400).send(error.message);
+      });
+  }
+
+  forResetPassword(req, res, next) {
+    const schema = Joi.object({
+      userId: Joi.string().guid().required(),
+      secretCode: Joi.string().guid().required(),
+      password: Joi.string()
+        .pattern(new RegExp(/[A-Z]/))
+        .pattern(new RegExp(/[a-z]/))
+        .pattern(new RegExp(/[0-9]/))
+        .pattern(new RegExp(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/))
+        .min(8)
+        .required(),
+      confirmPassword: Joi.ref('password'),
     });
 
     schema
