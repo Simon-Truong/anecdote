@@ -12,6 +12,10 @@ router.get('/users', lowerCase.forSearch, async (req, res) => {
   await _userService.getUsers(req, res);
 });
 
+router.get('/user/:id', async (req, res) => {
+  await _userService.getUserById(req, res);
+})
+
 router.post('/signup', [validation.forSignUp, lowerCase.forSignUp], async (req, res) => {
   await _userService.signUp(req, res);
 });

@@ -22,6 +22,18 @@ class UserRepository extends BaseRepository {
     return (await this._pool.query(pgQuery)).rows;
   }
 
+  async getUserById(userId) {
+    const pgQuery = `
+        SELECT first_name, surname, tags
+        FROM ${this._table}
+        WHERE id = $1
+      `;
+
+    const response = (await this._pool.query(pgQuery, [userId])).rows;
+
+    return this.handlePgResponse(response);
+  }
+
   async searchUsers(query) {
     const pgQuery = `
         SELECT DISTINCT id, first_name, surname, tags
@@ -45,11 +57,7 @@ class UserRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [email])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(response);
   }
 
   async createUser(newUser) {
@@ -90,11 +98,7 @@ class UserRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [email])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(response);
   }
 
   async findVerificationTokenByUserId(userId) {
@@ -107,11 +111,7 @@ class UserRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [userId])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(response);
   }
 
   async updateUserPassword(userId, newPassword) {
@@ -122,6 +122,14 @@ class UserRepository extends BaseRepository {
     `;
 
     await this._pool.query(pgQuery, [newPassword, userId]);
+  }
+
+  handlePgResponse(response) {
+    if (!response.length) {
+      return null;
+    }
+
+    return response[0];
   }
 }
 
