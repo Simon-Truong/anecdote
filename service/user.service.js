@@ -33,6 +33,27 @@ class UserService {
     }
   }
 
+  async getUserById(req, res) {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).send('User id not provided');
+    }
+
+    try {
+      var user = await _repo.getUserById(id);
+    } catch (error) {
+      console.log({error});
+      return res.status(500).send(error);
+    }
+
+    if (!user) {
+      return res.status(400).send('User does not exist');
+    }
+
+    return res.status(200).json(user);
+  }
+
   async signUp(req, res) {
     const { body } = req;
 
