@@ -16,6 +16,7 @@ class PassportMiddleware {
       }
 
       req.userId = user.id;
+      req.user = user;
 
       next();
     })(req, res);

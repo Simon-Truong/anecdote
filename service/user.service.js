@@ -43,7 +43,7 @@ class UserService {
     try {
       var user = await _repo.getUserById(id);
     } catch (error) {
-      console.log({error});
+      console.log({ error });
       return res.status(500).send(error);
     }
 
@@ -94,7 +94,7 @@ class UserService {
   }
 
   async logIn(req, res) {
-    const { userId } = req;
+    const { userId, user } = req;
 
     const SECONDS_IN_A_DAY = 86400;
 
@@ -106,7 +106,7 @@ class UserService {
       process.env.JWT_SECRET
     );
 
-    return res.status(200).send({ token });
+    return res.status(200).json({ token, user });
   }
 
   async verify(req, res) {

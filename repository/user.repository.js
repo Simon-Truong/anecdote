@@ -15,7 +15,7 @@ class UserRepository extends BaseRepository {
 
   async getAllUsers() {
     const pgQuery = `
-        SELECT *
+        SELECT id, first_name, surname, email, tags
         FROM ${this._table}
         WHERE verified = 'true'
       `;
@@ -52,7 +52,19 @@ class UserRepository extends BaseRepository {
 
   async getUserByEmail(email) {
     const pgQuery = `
-        SELECT *
+        SELECT id, first_name, surname, email
+        FROM ${this._table}
+        WHERE email = $1
+      `;
+
+    const response = (await this._pool.query(pgQuery, [email])).rows;
+
+    return this.handlePgResponse(response);
+  }
+
+  async getUserByEmailForLogin(email) {
+    const pgQuery = `
+        SELECT id, first_name, surname, email, password, verified
         FROM ${this._table}
         WHERE email = $1
       `;
