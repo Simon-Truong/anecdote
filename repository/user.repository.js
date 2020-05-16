@@ -17,6 +17,7 @@ class UserRepository extends BaseRepository {
     const pgQuery = `
         SELECT *
         FROM ${this._table}
+        WHERE verified = 'true'
       `;
 
     return (await this._pool.query(pgQuery)).rows;
@@ -37,12 +38,13 @@ class UserRepository extends BaseRepository {
   async searchUsers(query) {
     const pgQuery = `
         SELECT DISTINCT id, first_name, surname, tags
-        FROM (SELECT id, first_name, surname, tags, unnest(CASE WHEN "tags" <> '{}' THEN "tags" ELSE '{null}' END) AS unnestedTags
+        FROM (SELECT id, first_name, surname, tags, verified, unnest(CASE WHEN "tags" <> '{}' THEN "tags" ELSE '{null}' END) AS unnestedTags
           FROM ${this._table}) x
         WHERE 
         lower(first_name) LIKE $1 OR
         lower(surname) LIKE $1 OR
-        lower(unnestedTags) LIKE $1
+        lower(unnestedTags) LIKE $1 AND
+        verified = 'true'
       `;
 
     return (await this._pool.query(pgQuery, [`%${query}%`])).rows;
