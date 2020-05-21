@@ -2,10 +2,8 @@
 
 const Joi = require('@hapi/joi');
 
-class ValidationMiddleware {
+class UserValidation {
   forSignUp(req, res, next) {
-    const { firstName, surname, email } = req.body;
-
     const schema = Joi.object({
       firstName: Joi.string().trim().required(),
       surname: Joi.string().trim().required(),
@@ -128,4 +126,4 @@ class ValidationMiddleware {
   }
 }
 
-module.exports = new ValidationMiddleware();
+module.exports = new UserValidation();
