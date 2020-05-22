@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { Pool } = require('pg');
 
@@ -11,13 +11,13 @@ const parseFn = (value) => {
 types.setTypeParser(types.builtins.TIMESTAMP, parseFn);
 
 class BaseRepository {
-    constructor() {
-        this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
+  constructor() {
+    this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
-        this._pool = new Pool({
-        connectionString: this._connectionString,
-        });
-    }
+    this._pool = new Pool({
+      connectionString: this._connectionString,
+    });
+  }
 }
 
 module.exports = BaseRepository;

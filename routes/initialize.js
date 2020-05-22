@@ -2,9 +2,10 @@
 
 const express = require('express');
 const router = express.Router();
+const _initializeService = require('../service/initialize.service');
 
-router.get('/users', async (req, res) => {
-  await _userService.getUsers(req, res);
+router.post('/initialize', async (req, res) => {
+  await _initializeService.initialize(req, res);
 });
 
 module.exports = router;
