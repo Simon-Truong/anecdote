@@ -14,6 +14,7 @@ const cors = require('cors');
 // routes
 const users = require('./routes/users');
 const schedules = require('./routes/schedules');
+const initialize = require('./routes/initialize');
 
 // middle ware
 app.use(helmet());
@@ -24,5 +25,6 @@ app.use(passport.initialize());
 
 app.use('/api', users);
 app.use('/api', schedules);
+app.use('/api', initialize);
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

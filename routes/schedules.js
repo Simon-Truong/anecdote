@@ -3,12 +3,12 @@
 const express = require('express');
 const { scheduleValidation } = require('../middleware/validation/index');
 const passport = require('../middleware/authentication');
-const _userService = require('../service/user.service');
+const _scheduleService = require('../service/schedule.service');
 
 const router = express.Router();
 
-router.post('/schedule', scheduleValidation.forCreate, (req, res) => {
-  console.log(req.body);
+router.post('/schedule', scheduleValidation.forCreate, async (req, res) => {
+  await _scheduleService.createSchedule(req, res);
 });
 
 module.exports = router;
