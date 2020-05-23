@@ -10,7 +10,11 @@ class InitializeRepository extends BaseRepository {
   async initialize() {
     await this.createUUIDExtension();
 
-    await this.createScheduleTable();
+    await this.createPasswordTokensTable();
+
+    await this.createVerificationTokensTable();
+
+    await this.createSchedulesTable();
   }
 
   async createUUIDExtension() {
@@ -28,10 +32,22 @@ class InitializeRepository extends BaseRepository {
             expiry timestamp without time zone NOT NULL DEFAULT ((now() + interval '1h') at time zone 'utc')
         )`;
 
-    await pgQuery.query(pgQuery);
+    await this._pool.query(pgQuery);
   }
 
-  async createScheduleTable() {
+  async createVerificationTokensTable() {
+    const pgQuery = `
+      CREATE TABLE IF NOT EXISTS verificationtokens(
+        id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        user_id uuid NOT NULL REFERENCES users (id),
+        secret char(10) NOT NULL,
+        expiry timestamp without time zone NOT NULL DEFAULT ((now() + interval '1h') at time zone 'utc')
+      )`;
+
+    await this._pool.query(pgQuery);
+  }
+
+  async createSchedulesTable() {
     const pgQuery = `
         CREATE TABLE IF NOT EXISTS schedules(
             id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),

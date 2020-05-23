@@ -1,15 +1,12 @@
 'use strict';
 
 const pgp = require('pg-promise');
-const uuid = require('uuid');
 
 const BaseRepository = require('./base.repository');
 
 class PasswordTokenRepository extends BaseRepository {
   constructor() {
-    super();
-
-    this._table = process.env.PASSWORD_TOKENS_TABLE;
+    super(process.env.PASSWORD_TOKENS_TABLE);
   }
 
   async getPasswordTokenbyUserId(userId) {

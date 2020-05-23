@@ -11,12 +11,14 @@ const parseFn = (value) => {
 types.setTypeParser(types.builtins.TIMESTAMP, parseFn);
 
 class BaseRepository {
-  constructor() {
+  constructor(table) {
     this._connectionString = `postgresql://${process.env.USER}:${process.env.PASSWORD}@${process.env.HOST}:${process.env.POSTGRESQL_PORT}/${process.env.DB}`;
 
     this._pool = new Pool({
       connectionString: this._connectionString,
     });
+
+    this._table = table;
   }
 
   handlePgResponse(response) {

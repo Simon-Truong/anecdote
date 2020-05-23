@@ -8,21 +8,19 @@ const BaseRepository = require('./base.repository');
 
 class VerificationTokensRepository extends BaseRepository {
   constructor() {
-    super();
-
-    this._table = process.env.VERIFICATION_TOKENS_TABLE;
+    super(process.env.VERIFICATION_TOKENS_TABLE);
   }
 
   async createVerificationToken(newUserId) {
     const pgQuery = `
         INSERT INTO ${this._table}
-        (id, user_id, secret, expiry)
-        VALUES ($1, $2, $3, (now() + interval '1h') at time zone 'utc')
+        (user_id, secret)
+        VALUES ($1, $2)
       `;
 
     const secretCode = cryptoRandomString({ length: 10, type: 'base64' });
 
-    await this._pool.query(pgQuery, [uuid.v4(), newUserId, secretCode]);
+    await this._pool.query(pgQuery, [newUserId, secretCode]);
 
     return secretCode;
   }
@@ -38,17 +36,13 @@ class VerificationTokensRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [userId, secretCode])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(response);
   }
 
   async updateVerificationToken(id) {
     const pgQuery = `
       UPDATE ${this._table}
-      SET secret = $1, expiry = (now() + interval '1h') at time zone 'utc'
+      SET secret = $1, expiry = DEFAULT
       WHERE id = $2
     `;
 

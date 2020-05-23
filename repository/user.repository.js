@@ -7,9 +7,8 @@ const BaseRepository = require('./base.repository');
 
 class UserRepository extends BaseRepository {
   constructor() {
-    super();
+    super(process.env.USER_TABLE);
 
-    this._table = process.env.USER_TABLE;
     this._verificationTokenTable = process.env.VERIFICATION_TOKENS_TABLE;
   }
 
