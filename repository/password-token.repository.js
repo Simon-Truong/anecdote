@@ -21,11 +21,7 @@ class PasswordTokenRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [userId])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(response);
   }
 
   async getPasswordToken(userId, secretCode) {
@@ -38,39 +34,33 @@ class PasswordTokenRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [userId, secretCode])).rows;
 
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
+    return this.handlePgResponse(reponse);
   }
 
   async createPasswordToken(userId) {
     const pgQuery = `
-            INSERT INTO ${this._table}
-            (id, user_id, secret, expiry)
-            VALUES ($1, $2, $3, (now() + interval '1h') at time zone 'utc')
-        `;
+        INSERT INTO ${this._table}
+        (user_id)
+        VALUES ($1)
+        RETURNING secret
+    `;
 
-    const secret = uuid.v4();
+    const result = await this._pool.query(pgQuery, [userId]);
 
-    await this._pool.query(pgQuery, [uuid.v4(), userId, secret]);
-
-    return secret;
+    return result.rows[0].secret;
   }
 
   async updatePasswordToken(passwordTokenId) {
     const pgQuery = `
-            UPDATE ${this._table}
-            SET secret = $1, expiry = (now() + interval '1h') at time zone 'utc'
-            WHERE id = $2
-        `;
+        UPDATE ${this._table}
+        SET secret = DEFAULT, expiry = DEFAULT
+        WHERE id = $1
+        RETURNING secret
+    `;
 
-    const newSecret = uuid.v4();
+    const result = await this._pool.query(pgQuery, [passwordTokenId]);
 
-    await this._pool.query(pgQuery, [newSecret, passwordTokenId]);
-
-    return newSecret;
+    return result.rows[0].secret;
   }
 }
 

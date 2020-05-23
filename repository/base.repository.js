@@ -18,6 +18,14 @@ class BaseRepository {
       connectionString: this._connectionString,
     });
   }
+
+  handlePgResponse(response) {
+    if (!response.length) {
+      return null;
+    }
+
+    return response[0];
+  }
 }
 
 module.exports = BaseRepository;

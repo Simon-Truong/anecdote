@@ -137,14 +137,6 @@ class UserRepository extends BaseRepository {
 
     await this._pool.query(pgQuery, [newPassword, userId]);
   }
-
-  handlePgResponse(response) {
-    if (!response.length) {
-      return null;
-    }
-
-    return response[0];
-  }
 }
 
 //! debugging purposes only
