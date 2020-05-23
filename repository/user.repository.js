@@ -1,6 +1,5 @@
 'use strict';
 
-const uuid = require('uuid');
 const pgp = require('pg-promise');
 
 const BaseRepository = require('./base.repository');
@@ -80,15 +79,14 @@ class UserRepository extends BaseRepository {
 
     const pgQuery = `
         INSERT INTO ${this._table}
-        (id, first_name, surname, email, password, joined, tags)
-        VALUES ($1, $2, $3, $4, $5, now() at time zone 'utc', $6)
+        (first_name, surname, email, password, tags)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id
       `;
 
-    const newUUID = uuid.v4();
+    const response = await this._pool.query(pgQuery, [firstName, surname, email, password, processedTags]);
 
-    await this._pool.query(pgQuery, [newUUID, firstName, surname, email, password, processedTags]);
-
-    return newUUID;
+    return response.rows[0].id;
   }
 
   async verifyUserStatus(userId) {

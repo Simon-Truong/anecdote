@@ -191,7 +191,7 @@ class UserService {
     }
 
     if (!existentUser) {
-      return res.status(400).send('Email does not exists');
+      return res.status(400).send('Email does not exist');
     }
 
     const userId = existentUser.id;

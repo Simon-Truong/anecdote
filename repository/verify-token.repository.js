@@ -2,7 +2,6 @@
 
 const pgp = require('pg-promise');
 const cryptoRandomString = require('crypto-random-string');
-const uuid = require('uuid');
 
 const BaseRepository = require('./base.repository');
 

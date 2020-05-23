@@ -31,7 +31,7 @@ class PasswordTokenRepository extends BaseRepository {
 
     const response = (await this._pool.query(pgQuery, [userId, secretCode])).rows;
 
-    return this.handlePgResponse(reponse);
+    return this.handlePgResponse(response);
   }
 
   async createPasswordToken(userId) {

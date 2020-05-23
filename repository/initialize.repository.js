@@ -10,6 +10,8 @@ class InitializeRepository extends BaseRepository {
   async initialize() {
     await this.createUUIDExtension();
 
+    await this.createUsersTable();
+
     await this.createPasswordTokensTable();
 
     await this.createVerificationTokensTable();
@@ -19,6 +21,23 @@ class InitializeRepository extends BaseRepository {
 
   async createUUIDExtension() {
     const pgQuery = `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
+
+    await this._pool.query(pgQuery);
+  }
+
+  async createUsersTable() {
+    const pgQuery = `
+      CREATE TABLE IF NOT EXISTS users(
+        id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        first_name varchar NOT NULL,
+        surname varchar NOT NULL,
+        email varchar NOT NULL,
+        password varchar NOT NULL,
+        tags varchar[] DEFAULT '{}',
+        joined timestamp without time zone NOT NULL DEFAULT (now() at time zone 'utc'),
+        verified boolean DEFAULT false
+      )
+    `;
 
     await this._pool.query(pgQuery);
   }
