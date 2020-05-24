@@ -74,8 +74,8 @@ class InitializeRepository extends BaseRepository {
             selected_user_id uuid NOT NULL REFERENCES users (id),
             time_from timestamp without time zone NOT NULL,
             time_to timestamp without time zone NOT NULL,
-            lat smallint NOT NULL,
-            lng smallint NOT NULL,
+            lat real NOT NULL,
+            lng real NOT NULL,
             comments varchar (255)
         )
     `;
