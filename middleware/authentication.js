@@ -1,7 +1,7 @@
 'use strict';
 const passport = require('passport');
 class PassportMiddleware {
-  authenticate(req, res, next) {
+  authenticateForLogin(req, res, next) {
     passport.authenticate('local', { session: false }, (error, user, info) => {
       if (error) {
         return res.status(500).send(error);

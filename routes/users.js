@@ -20,7 +20,7 @@ router.post('/signup', [userValidation.forSignUp, lowerCase.forSignUp], async (r
   await _userService.signUp(req, res);
 });
 
-router.post('/login', [userValidation.forLogin, lowerCase.forLogin, passport.authenticate], async (req, res) => {
+router.post('/login', [userValidation.forLogin, lowerCase.forLogin, passport.authenticateForLogin], async (req, res) => {
   await _userService.logIn(req, res);
 });
 
