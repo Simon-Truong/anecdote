@@ -4,6 +4,7 @@ const _repo = require('../repository/user.repository');
 const _verificationTokenService = require('./verification-token.service');
 const _emailService = require('./email.service');
 const _passwordTokenService = require('./password-token.service');
+const _sessionService = require('./session.service');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
@@ -96,9 +97,16 @@ class UserService {
   async logIn(req, res) {
     const { userId, user } = req;
 
+    try {
+      var refreshToken = await _sessionService.createSession(userId);
+    } catch (error) {
+      console.log({error});
+      return res.status(500).send(500);
+    }
+
     const SECONDS_IN_A_DAY = 86400;
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       {
         userId: userId,
         exp: Math.floor(Date.now() / 1000) + SECONDS_IN_A_DAY,
@@ -106,9 +114,9 @@ class UserService {
       process.env.JWT_SECRET
     );
 
-    res.cookie('refresh_token', 'abcdefg', { httpOnly: true, signed: true });
+    res.cookie('refresh_token', refreshToken, { httpOnly: true, signed: true });
 
-    return res.status(200).json({ token, user });
+    return res.status(200).json({ token: accessToken, user });
   }
 
   async verify(req, res) {
