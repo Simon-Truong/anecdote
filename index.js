@@ -20,7 +20,7 @@ const initialize = require('./routes/initialize');
 // middle ware
 app.use(helmet());
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(morgan('dev'));
 app.use(passport.initialize());
 app.use(cookieParser());
