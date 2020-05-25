@@ -17,6 +17,8 @@ class InitializeRepository extends BaseRepository {
     await this.createVerificationTokensTable();
 
     await this.createSchedulesTable();
+
+    await this.createSessionsTable();
   }
 
   async createUUIDExtension() {
@@ -27,7 +29,7 @@ class InitializeRepository extends BaseRepository {
 
   async createUsersTable() {
     const pgQuery = `
-      CREATE TABLE IF NOT EXISTS users(
+      CREATE TABLE IF NOT EXISTS ${process.env.USERS_TABLE} (
         id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
         first_name varchar NOT NULL,
         surname varchar NOT NULL,
@@ -44,9 +46,9 @@ class InitializeRepository extends BaseRepository {
 
   async createPasswordTokensTable() {
     const pgQuery = `
-        CREATE TABLE IF NOT EXISTS passwordtokens(
+        CREATE TABLE IF NOT EXISTS ${process.env.PASSWORD_TOKENS_TABLE} (
             id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
-            user_id uuid NOT NULL REFERENCES users (id),
+            user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id),
             secret uuid NOT NULL DEFAULT uuid_generate_v4 (),
             expiry timestamp without time zone NOT NULL DEFAULT ((now() + interval '1h') at time zone 'utc')
         )`;
@@ -56,9 +58,9 @@ class InitializeRepository extends BaseRepository {
 
   async createVerificationTokensTable() {
     const pgQuery = `
-      CREATE TABLE IF NOT EXISTS verificationtokens(
+      CREATE TABLE IF NOT EXISTS ${process.env.VERIFICATION_TOKENS_TABLE} (
         id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
-        user_id uuid NOT NULL REFERENCES users (id),
+        user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id),
         secret char(10) NOT NULL,
         expiry timestamp without time zone NOT NULL DEFAULT ((now() + interval '1h') at time zone 'utc')
       )`;
@@ -68,10 +70,10 @@ class InitializeRepository extends BaseRepository {
 
   async createSchedulesTable() {
     const pgQuery = `
-        CREATE TABLE IF NOT EXISTS schedules(
+        CREATE TABLE IF NOT EXISTS ${process.env.SCHEDULES_TABLE} (
             id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
-            user_id uuid NOT NULL REFERENCES users (id),
-            selected_user_id uuid NOT NULL REFERENCES users (id),
+            user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id),
+            selected_user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id),
             time_from timestamp without time zone NOT NULL,
             time_to timestamp without time zone NOT NULL,
             lat real NOT NULL,
@@ -79,6 +81,17 @@ class InitializeRepository extends BaseRepository {
             comments varchar (255)
         )
     `;
+
+    await this._pool.query(pgQuery);
+  }
+
+  async createSessionsTable() {
+    const pgQuery = `
+      CREATE TABLE IF NOT EXISTS ${process.env.SESSIONS_TABLE} (
+        id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id)
+      )
+    `
 
     await this._pool.query(pgQuery);
   }
