@@ -10,6 +10,7 @@ const passport = require('passport');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 // routes
 const users = require('./routes/users');
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(passport.initialize());
+app.use(cookieParser());
 
 app.use('/api', initialize);
 app.use('/api', users);
