@@ -106,7 +106,7 @@ class UserService {
       process.env.JWT_SECRET
     );
 
-    res.cookie('refresh_token', 'abcdefg', { httpOnly: true });
+    res.cookie('refresh_token', 'abcdefg', { httpOnly: true, signed: true });
 
     return res.status(200).json({ token, user });
   }
