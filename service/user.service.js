@@ -4,8 +4,6 @@ const _repo = require('../repository/user.repository');
 const _verificationTokenService = require('./verification-token.service');
 const _emailService = require('./email.service');
 const _passwordTokenService = require('./password-token.service');
-const _sessionService = require('./session.service');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
 
@@ -92,32 +90,6 @@ class UserService {
 
       return res.status(200).send('You have sucessfully signed up, please verify your email');
     });
-  }
-
-  async logIn(req, res) {
-    const { userId, user } = req;
-
-    try {
-      var refreshToken = await _sessionService.createSession(userId);
-    } catch (error) {
-      console.log({ error });
-      return res.status(500).send(500);
-    }
-
-    const MILLISECONDS_IN_A_DAY = 86400000;
-    const ACCESS_TOKEN_EXPIRATION_IN_MINUTES = 15;
-
-    const accessToken = jwt.sign(
-      {
-        userId: userId,
-        expiresIn: ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
-      },
-      process.env.JWT_SECRET
-    );
-
-    res.cookie('refresh_token', refreshToken, { httpOnly: true, signed: true, maxAge: MILLISECONDS_IN_A_DAY });
-
-    return res.status(200).json({ token: accessToken, accessTokenExpInMins: 15, user });
   }
 
   async verify(req, res) {
