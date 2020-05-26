@@ -100,23 +100,24 @@ class UserService {
     try {
       var refreshToken = await _sessionService.createSession(userId);
     } catch (error) {
-      console.log({error});
+      console.log({ error });
       return res.status(500).send(500);
     }
 
-    const SECONDS_IN_A_DAY = 86400;
+    const MILLISECONDS_IN_A_DAY = 86400000;
+    const ACCESS_TOKEN_EXPIRATION_IN_MINUTES = 15;
 
     const accessToken = jwt.sign(
       {
         userId: userId,
-        exp: Math.floor(Date.now() / 1000) + SECONDS_IN_A_DAY,
+        expiresIn: ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
       },
       process.env.JWT_SECRET
     );
 
-    res.cookie('refresh_token', refreshToken, { httpOnly: true, signed: true });
+    res.cookie('refresh_token', refreshToken, { httpOnly: true, signed: true, maxAge: MILLISECONDS_IN_A_DAY });
 
-    return res.status(200).json({ token: accessToken, user });
+    return res.status(200).json({ token: accessToken, accessTokenExpInMins: 15, user });
   }
 
   async verify(req, res) {
