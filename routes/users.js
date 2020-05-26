@@ -2,7 +2,6 @@
 
 const express = require('express');
 const { userValidation } = require('../middleware/validation/index');
-const passport = require('../middleware/authentication');
 const lowerCase = require('../middleware/lowercase');
 const _userService = require('../service/user.service');
 
@@ -18,10 +17,6 @@ router.get('/user/:id', async (req, res) => {
 
 router.post('/signup', [userValidation.forSignUp, lowerCase.forSignUp], async (req, res) => {
   await _userService.signUp(req, res);
-});
-
-router.post('/login', [userValidation.forLogin, lowerCase.forLogin, passport.authenticateForLogin], async (req, res) => {
-  await _userService.logIn(req, res);
 });
 
 router.post('/verify', userValidation.forVerification, async (req, res) => {

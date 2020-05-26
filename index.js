@@ -16,6 +16,7 @@ const cookieParser = require('cookie-parser');
 const users = require('./routes/users');
 const schedules = require('./routes/schedules');
 const initialize = require('./routes/initialize');
+const auth = require('./routes/auth');
 
 // middle ware
 app.use(helmet());
@@ -24,6 +25,8 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(morgan('dev'));
 app.use(passport.initialize());
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+app.use('/auth', auth);
 
 app.use('/api', initialize);
 app.use('/api', users);
