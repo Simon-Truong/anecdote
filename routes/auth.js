@@ -10,11 +10,11 @@ const _authService = require('../service/auth.service');
 const router = express.Router();
 
 router.post('/login', [userValidation.forLogin, lowerCase.forLogin, passport.authenticateForLogin], async (req, res) => {
-    await _authService.logIn(req, res);
+  await _authService.logIn(req, res);
 });
 
 router.get('/refreshToken/:id', async (req, res) => {
-    await _authService.refreshSession(req, res);
+  await _authService.refreshSession(req, res);
 });
 
 module.exports = router;

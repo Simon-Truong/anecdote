@@ -89,9 +89,10 @@ class InitializeRepository extends BaseRepository {
     const pgQuery = `
       CREATE TABLE IF NOT EXISTS ${process.env.SESSIONS_TABLE} (
         id uuid NOT NULL PRIMARY KEY DEFAULT uuid_generate_v4 (),
+        refresh_token uuid NOT NULL DEFAULT uuid_generate_v4 (),
         user_id uuid NOT NULL REFERENCES ${process.env.USERS_TABLE} (id)
       )
-    `
+    `;
 
     await this._pool.query(pgQuery);
   }
