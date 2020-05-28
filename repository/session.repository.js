@@ -7,11 +7,36 @@ class SessionRepository extends BaseRepository {
     super(process.env.SESSIONS_TABLE);
   }
 
+  async getSession(userId) {
+    const pgQuery = `
+      SELECT id
+      FROM ${this._table}
+      WHERE user_id = $1
+    `;
+
+    const response = await this._pool.query(pgQuery, [userId]);
+
+    return response.rows.length;
+  }
+
   async createSession(userId) {
     const pgQuery = `
         INSERT INTO ${this._table} (user_id)
         VALUES ($1)
         RETURNING refresh_token
+    `;
+
+    const response = await this._pool.query(pgQuery, [userId]);
+
+    return response.rows[0].refresh_token;
+  }
+
+  async updateSession(userId) {
+    const pgQuery = `
+      UPDATE ${this._table}
+      SET refresh_token = DEFAULT
+      WHERE user_id = $1
+      RETURNING refresh_token
     `;
 
     const response = await this._pool.query(pgQuery, [userId]);
