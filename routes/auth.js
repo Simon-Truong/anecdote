@@ -13,8 +13,12 @@ router.post('/login', [userValidation.forLogin, lowerCase.forLogin, passport.aut
   await _authService.logIn(req, res);
 });
 
-router.get('/refreshToken/:id', async (req, res) => {
+router.get('/refreshToken', async (req, res) => {
   await _authService.refreshSession(req, res);
 });
+
+router.get('/removeRefreshToken', (req, res) => {
+  _authService.removeRefreshToken(req, res);
+})
 
 module.exports = router;

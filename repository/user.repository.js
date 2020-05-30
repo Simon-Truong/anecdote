@@ -33,6 +33,18 @@ class UserRepository extends BaseRepository {
     return this.handlePgResponse(response);
   }
 
+  async getUserByIdRaw(userId) {
+    const pgQuery = `
+        SELECT first_name, surname, id, email, verified
+        FROM ${this._table}
+        WHERE id = $1
+      `;
+
+    const response = (await this._pool.query(pgQuery, [userId])).rows;
+
+    return this.handlePgResponse(response);
+  }
+
   async searchUsers(query) {
     const pgQuery = `
         SELECT DISTINCT id, first_name, surname, tags

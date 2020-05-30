@@ -53,6 +53,10 @@ class UserService {
     return res.status(200).json(user);
   }
 
+  async getUserByIdRaw(id) {
+    return await _repo.getUserByIdRaw(id);
+  }
+
   async signUp(req, res) {
     const { body } = req;
 

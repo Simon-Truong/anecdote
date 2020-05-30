@@ -11,8 +11,15 @@ class SessionSevice {
     return await _repo.createSession(userId);
   }
 
-  async updateSession(userId){
-    return await _repo.updateSession(userId);
+  /**
+   * for login
+   */
+  async updateSessionById(userId) {
+    return await _repo.updateSessionById(userId);
+  }
+
+  async updateSessionByRefreshToken(refreshToken) {
+    return await _repo.updateSessionByRefreshToken(refreshToken);
   }
 }
 

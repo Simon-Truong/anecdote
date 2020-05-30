@@ -31,7 +31,7 @@ class SessionRepository extends BaseRepository {
     return response.rows[0].refresh_token;
   }
 
-  async updateSession(userId) {
+  async updateSessionById(userId) {
     const pgQuery = `
       UPDATE ${this._table}
       SET refresh_token = DEFAULT
@@ -43,6 +43,20 @@ class SessionRepository extends BaseRepository {
 
     return response.rows[0].refresh_token;
   }
+
+  async updateSessionByRefreshToken(refreshToken) {
+    const pgQuery = `
+      UPDATE ${this._table}
+      SET refresh_token = DEFAULT
+      WHERE refresh_token = $1
+      RETURNING refresh_token, user_id
+    `;
+
+    const response = await this._pool.query(pgQuery, [refreshToken]);
+
+    return response.rows[0];
+  }
+
 }
 
 module.exports = new SessionRepository();

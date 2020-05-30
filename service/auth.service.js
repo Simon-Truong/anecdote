@@ -1,6 +1,7 @@
 'use strict';
 
 const _sessionService = require('./session.service');
+const _userService = require('./user.service');
 const jwt = require('jsonwebtoken');
 
 class AuthService {
@@ -17,7 +18,7 @@ class AuthService {
       const existentSession = await _sessionService.getSession(userId);
 
       if (existentSession) {
-        var refreshToken = await _sessionService.updateSession(userId);
+        var refreshToken = await _sessionService.updateSessionById(userId);
       } else {
         var refreshToken = await _sessionService.createSession(userId);
       }
@@ -48,29 +49,32 @@ class AuthService {
       return res.status(401).send('Refresh token expired');
     }
 
-    const {
-      params: { id },
-    } = req;
-
     try {
-      var newRefreshToken = await _sessionService.updateSession(id);
+      var { refresh_token, user_id } = await _sessionService.updateSessionByRefreshToken(refreshToken);
+      
+      // need to restore user state
+      var user = await _userService.getUserByIdRaw(user_id);
     } catch (error) {
       console.log({ error });
-      return res.send(500).send(error);
+      return res.status(500).send(error);
     }
 
     const newAccessToken = jwt.sign(
       {
-        userId: id,
+        userId: user_id,
         expiresIn: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
       },
       process.env.JWT_SECRET
     );
 
-    res.clearCookie('refreshToken');
-    res.cookie('refreshToken', newRefreshToken, { httpOnly: true, signed: true, maxAge: this.REFRESH_TOKEN_EXPIRATION_IN_MILLISECONDS });
+    res.cookie('refreshToken', refresh_token, { httpOnly: true, signed: true, maxAge: this.REFRESH_TOKEN_EXPIRATION_IN_MILLISECONDS });
 
-    return res.status(200).json({ accessToken: newAccessToken, accessTokenExpInMins: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES - 5 });
+    return res.status(200).json({ accessToken: newAccessToken, accessTokenExpInMins: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES - 5, user });
+  }
+
+  removeRefreshToken(req, res) {
+    res.cookie('refreshToken', null, { httpOnly: true, signed: true, maxAge: 0 });
+    return res.status(200).send('Refresh token successfully deleted');
   }
 }
 
