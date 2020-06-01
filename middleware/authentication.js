@@ -32,7 +32,7 @@ class PassportMiddleware {
         return res.status(400).send(info.message);
       }
 
-      next();
+      next(); 
     })(req, res);
   }
 }

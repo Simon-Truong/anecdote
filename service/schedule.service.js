@@ -1,7 +1,6 @@
 'use strict';
 
 const _repo = require('../repository/schedule.repository');
-const jwt = require('jsonwebtoken');
 
 class ScheduleService {
   async createSchedule(req, res) {

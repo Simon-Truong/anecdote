@@ -30,9 +30,11 @@ class AuthService {
     const accessToken = jwt.sign(
       {
         userId: userId,
-        expiresIn: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        expiresIn: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
+      }
     );
 
     res.cookie('refreshToken', refreshToken, { httpOnly: true, signed: true, maxAge: this.REFRESH_TOKEN_EXPIRATION_IN_MILLISECONDS });
@@ -51,7 +53,7 @@ class AuthService {
 
     try {
       var { refresh_token, user_id } = await _sessionService.updateSessionByRefreshToken(refreshToken);
-      
+
       // need to restore user state
       var user = await _userService.getUserByIdRaw(user_id);
     } catch (error) {
@@ -62,9 +64,11 @@ class AuthService {
     const newAccessToken = jwt.sign(
       {
         userId: user_id,
-        expiresIn: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        expiresIn: this.ACCESS_TOKEN_EXPIRATION_IN_MINUTES + 'm',
+      }
     );
 
     res.cookie('refreshToken', refresh_token, { httpOnly: true, signed: true, maxAge: this.REFRESH_TOKEN_EXPIRATION_IN_MILLISECONDS });
