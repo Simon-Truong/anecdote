@@ -21,6 +21,20 @@ class PassportMiddleware {
       next();
     })(req, res);
   }
+
+  authenticateJWT(req, res, next) {
+    passport.authenticate('jwt', { session: false }, (error, user, info) => {
+      if (error) {
+        return res.status(500).send(error);
+      }
+
+      if (!user) {
+        return res.status(400).send(info.message);
+      }
+
+      next();
+    })(req, res);
+  }
 }
 
 module.exports = new PassportMiddleware();

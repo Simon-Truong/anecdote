@@ -45,21 +45,6 @@ class UserRepository extends BaseRepository {
     return this.handlePgResponse(response);
   }
 
-  async searchUsers(query) {
-    const pgQuery = `
-        SELECT DISTINCT id, first_name, surname, tags
-        FROM (SELECT id, first_name, surname, tags, verified, unnest(CASE WHEN "tags" <> '{}' THEN "tags" ELSE '{null}' END) AS unnestedTags
-          FROM ${this._table}) x
-        WHERE 
-        lower(first_name) LIKE $1 OR
-        lower(surname) LIKE $1 OR
-        lower(unnestedTags) LIKE $1 AND
-        verified = 'true'
-      `;
-
-    return (await this._pool.query(pgQuery, [`%${query}%`])).rows;
-  }
-
   async getUserByEmail(email) {
     const pgQuery = `
         SELECT id, first_name, surname, email
@@ -82,6 +67,21 @@ class UserRepository extends BaseRepository {
     const response = (await this._pool.query(pgQuery, [email])).rows;
 
     return this.handlePgResponse(response);
+  }
+
+  async searchUsers(query) {
+    const pgQuery = `
+        SELECT DISTINCT id, first_name, surname, tags
+        FROM (SELECT id, first_name, surname, tags, verified, unnest(CASE WHEN "tags" <> '{}' THEN "tags" ELSE '{null}' END) AS unnestedTags
+          FROM ${this._table}) x
+        WHERE 
+        lower(first_name) LIKE $1 OR
+        lower(surname) LIKE $1 OR
+        lower(unnestedTags) LIKE $1 AND
+        verified = 'true'
+      `;
+
+    return (await this._pool.query(pgQuery, [`%${query}%`])).rows;
   }
 
   async createUser(newUser) {

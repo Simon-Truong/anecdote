@@ -53,6 +53,10 @@ class UserService {
     return res.status(200).json(user);
   }
 
+  async getUserByEmailForLogin(email) {
+    return await _repo.getUserByEmailForLogin(email);
+  }
+
   async getUserByIdRaw(id) {
     return await _repo.getUserByIdRaw(id);
   }

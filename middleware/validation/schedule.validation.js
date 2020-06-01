@@ -15,7 +15,7 @@ class ScheduleValidation {
       to: Joi.date().iso().required(),
       lat: Joi.number().required(),
       lng: Joi.number().required(),
-      comments: Joi.string().trim(),
+      comments: Joi.string().trim().allow(null).allow(''),
     });
 
     schema
