@@ -20,6 +20,25 @@ class ScheduleRepository extends BaseRespository {
 
     await this._pool.query(pgQuery, [userId, selectedUserId, from, to, lat, lng, comments]);
   }
+
+  async validateSchedule(newSchedule) {
+    const { from, to } = newSchedule;
+
+    const pgQuery = `
+      SELECT id
+      FROM ${this._table}
+      WHERE                
+        time_from <= $2 AND  time_from >= $1 OR
+        time_to >= $1 AND time_to <= $2 OR
+        time_from >= $1 AND time_to <= $2
+    `
+
+    const response = (await this._pool.query(pgQuery, [from, to])).rows;
+
+    return this.handlePgResponse(response);
+  }
+
+  
 }
 
 module.exports = new ScheduleRepository();
