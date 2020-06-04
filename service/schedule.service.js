@@ -6,7 +6,7 @@ const moment = require('moment');
 class ScheduleService {
   async getSchedules(req, res) {
     const {
-      query: { d: monthYear },
+      query: { d: monthYear, u: selectedUserId },
     } = req;
 
     const date = moment.utc(monthYear);
@@ -19,7 +19,7 @@ class ScheduleService {
     const timeTo = date.add(1, 'months').format();
 
     try {
-      var schedules = await _repo.getSchedules(timeFrom, timeTo);
+      var schedules = await _repo.getSchedules(selectedUserId, timeFrom, timeTo);
     } catch (error) {
       console.log({ error });
       return res.status(500).send(error);
@@ -30,6 +30,30 @@ class ScheduleService {
     const uniqueSchedules = [...new Set(formattedSchedules)];
 
     return res.status(200).json(uniqueSchedules);
+  }
+
+  async getDetailSchedules(req, res) {
+    const {
+      query: { f: timeFrom, t: timeTo, u: selectedUserId },
+    } = req;
+
+    const newTimeTo = moment.utc(timeTo, 'YYYY-MM-DD').add(1, 'days').format('YYYY-MM-DD');
+
+    try {
+      var detailSchedules = await _repo.getDetailSchedules(selectedUserId, timeFrom, newTimeTo);
+    } catch (error) {
+      console.log({ error });
+      return res.status(500).send(error);
+    }
+
+    var formattedDetailSchedules = detailSchedules.map((schedule) => {
+      return {
+        start: schedule.time_from.format('YYYY-MM-DD HH:mm'),
+        end: schedule.time_to.format('YYYY-MM-DD HH:mm'),
+      };
+    });
+
+    return res.status(200).json(formattedDetailSchedules);
   }
 
   async createSchedule(req, res) {

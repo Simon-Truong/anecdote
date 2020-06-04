@@ -32,6 +32,8 @@ class PassportMiddleware {
         return res.status(400).send(info.message);
       }
 
+      req.user = user;
+
       next(); 
     })(req, res);
   }
