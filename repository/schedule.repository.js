@@ -9,6 +9,16 @@ class ScheduleRepository extends BaseRespository {
     super(process.env.SCHEDULES_TABLE);
   }
 
+  async getSchedules(timeFrom, timeTo) {
+    const pgQuery = `
+        SELECT time_from 
+        FROM ${this._table}
+        WHERE time_from > $1 AND time_to < $2
+    `;
+
+    return (await this._pool.query(pgQuery, [timeFrom, timeTo])).rows;
+  }
+
   async createSchedule(newSchedule) {
     const { userId, selectedUserId, from, to, lat, lng, comments } = newSchedule;
 
