@@ -72,7 +72,7 @@ class ScheduleService {
       return res.status(500).send(error);
     }
 
-    return res.status(200).send('Scheduled successfully');
+    return res.status(200).send('Schedule successfully submitted');
   }
 }
 
